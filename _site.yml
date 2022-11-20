@@ -8,7 +8,7 @@ navbar:
         - text: Create, review, update, delete
           href: https://kevinwang09.github.io/learnSQL/CRUD.html
         - text: Basic operations
-          href: https://kevinwang09.github.io/learnSQL/basics.html
+          href: https://kevinwang09.github.io/learnSQL/basic.html
         - text: Join operations
           href: https://kevinwang09.github.io/learnSQL/join.html
   right:

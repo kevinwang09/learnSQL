@@ -9,11 +9,10 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Kevin Wang" />
+<meta name="author" content="Kevin Wang Ph.D." />
 
-<meta name="date" content="2022-11-19" />
 
-<title>Create, review, update and delete</title>
+<title>Learn SQL</title>
 
 <script src="site_libs/header-attrs-2.15/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -299,309 +298,24 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Create, review, update and delete</h1>
-<h4 class="author">Kevin Wang</h4>
-<h4 class="date">19 Nov 2022</h4>
+<h1 class="title toc-ignore">Learn SQL</h1>
+<h4 class="author">Kevin Wang Ph.D.</h4>
 
 </div>
 
 <div id="TOC">
 <ul>
-<li><a href="#setting-up-connection-in-rsqlite"
-id="toc-setting-up-connection-in-rsqlite">Setting up connection (in
-<code>RSQLite</code>)</a></li>
-<li><a href="#creating-a-table" id="toc-creating-a-table">Creating a
-table</a></li>
-<li><a href="#inserting-rows" id="toc-inserting-rows">Inserting
-rows</a></li>
-<li><a href="#editing-rows" id="toc-editing-rows">Editing rows</a></li>
-<li><a href="#deleting-rows" id="toc-deleting-rows">Deleting
-rows</a></li>
-<li><a href="#adding-a-new-column" id="toc-adding-a-new-column">Adding a
-new column</a></li>
-<li><a href="#enforcing-uniqueness-in-the-columns"
-id="toc-enforcing-uniqueness-in-the-columns">Enforcing uniqueness in the
-columns</a></li>
+<li><a href="#why-i-am-making-this-site"
+id="toc-why-i-am-making-this-site">Why I am making this site?</a></li>
 </ul>
 </div>
 
-<div id="setting-up-connection-in-rsqlite" class="section level1">
-<h1>Setting up connection (in <code>RSQLite</code>)</h1>
-<p>This chunk of code will take the in-memory data and allow this data
-to be queried exactly like a SQL database.</p>
-<pre class="r"><code>library(dplyr)
-library(DBI)
-library(tidyverse)
-# Create an ephemeral in-memory RSQLite database
-con = dbConnect(RSQLite::SQLite(), &quot;:memory:&quot;)
-# tbl = tibble(
-#   numbers = 1:5, 
-#   letters = letters[1:5])
-dbListTables(con)</code></pre>
-<pre><code>## character(0)</code></pre>
-<pre class="r"><code># dbWriteTable(con, &quot;tbl&quot;, tbl)
-# dbListTables(con)
-# dbListFields(con, &quot;tbl&quot;)</code></pre>
-</div>
-<div id="creating-a-table" class="section level1">
-<h1>Creating a table</h1>
-<pre class="sql"><code>/*Creating a table called tbl, with the columns numbers and letters*/
-
-CREATE TABLE tbl (
-  numbers INT, 
-  letters VARCHAR(10)
-);</code></pre>
-<pre class="sql"><code>INSERT INTO tbl
- (numbers, letters)
-VALUES
- (1, &quot;A&quot;),
- (2, &quot;B&quot;),
- (3, &quot;C&quot;);</code></pre>
-<pre class="sql"><code>SELECT *
-FROM tbl;</code></pre>
-<div class="knitsql-table">
-<table>
-<caption>3 records</caption>
-<thead>
-<tr class="header">
-<th align="left">numbers</th>
-<th align="left">letters</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">1</td>
-<td align="left">A</td>
-</tr>
-<tr class="even">
-<td align="left">2</td>
-<td align="left">B</td>
-</tr>
-<tr class="odd">
-<td align="left">3</td>
-<td align="left">C</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div id="inserting-rows" class="section level1">
-<h1>Inserting rows</h1>
-<pre class="sql"><code>INSERT INTO tbl
- (numbers, letters)
-VALUES
- (4, &quot;D&quot;);</code></pre>
-<pre class="sql"><code>SELECT *
-FROM tbl;</code></pre>
-<div class="knitsql-table">
-<table>
-<caption>4 records</caption>
-<thead>
-<tr class="header">
-<th align="left">numbers</th>
-<th align="left">letters</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">1</td>
-<td align="left">A</td>
-</tr>
-<tr class="even">
-<td align="left">2</td>
-<td align="left">B</td>
-</tr>
-<tr class="odd">
-<td align="left">3</td>
-<td align="left">C</td>
-</tr>
-<tr class="even">
-<td align="left">4</td>
-<td align="left">D</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div id="editing-rows" class="section level1">
-<h1>Editing rows</h1>
-<pre class="sql"><code>UPDATE tbl
-SET 
-  letters = &#39;Unknown&#39;
-WHERE 
-  numbers IN (2, 3)</code></pre>
-<pre class="sql"><code>SELECT *
-FROM tbl;</code></pre>
-<div class="knitsql-table">
-<table>
-<caption>4 records</caption>
-<thead>
-<tr class="header">
-<th align="left">numbers</th>
-<th align="left">letters</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">1</td>
-<td align="left">A</td>
-</tr>
-<tr class="even">
-<td align="left">2</td>
-<td align="left">Unknown</td>
-</tr>
-<tr class="odd">
-<td align="left">3</td>
-<td align="left">Unknown</td>
-</tr>
-<tr class="even">
-<td align="left">4</td>
-<td align="left">D</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div id="deleting-rows" class="section level1">
-<h1>Deleting rows</h1>
-<pre class="sql"><code>DELETE FROM tbl WHERE letters = &#39;Unknown&#39;</code></pre>
-<pre class="sql"><code>SELECT *
-FROM tbl;</code></pre>
-<div class="knitsql-table">
-<table>
-<caption>2 records</caption>
-<thead>
-<tr class="header">
-<th align="right">numbers</th>
-<th align="left">letters</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="right">1</td>
-<td align="left">A</td>
-</tr>
-<tr class="even">
-<td align="right">4</td>
-<td align="left">D</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div id="adding-a-new-column" class="section level1">
-<h1>Adding a new column</h1>
-<p>This initiates a new column.</p>
-<pre class="sql"><code>ALTER TABLE tbl
-  ADD n2 DECIMAL (10, 2);</code></pre>
-<pre class="sql"><code>SELECT *
-FROM tbl</code></pre>
-<div class="knitsql-table">
-<table>
-<caption>2 records</caption>
-<thead>
-<tr class="header">
-<th align="right">numbers</th>
-<th align="left">letters</th>
-<th align="right">n2</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="right">1</td>
-<td align="left">A</td>
-<td align="right">NA</td>
-</tr>
-<tr class="even">
-<td align="right">4</td>
-<td align="left">D</td>
-<td align="right">NA</td>
-</tr>
-</tbody>
-</table>
-</div>
-<p><code>UPDATE...SET...</code> allows one to set values for the
-columns.</p>
-<pre class="sql"><code>UPDATE tbl 
-SET n2 = numbers;</code></pre>
-<pre class="sql"><code>SELECT *
-FROM tbl</code></pre>
-<div class="knitsql-table">
-<table>
-<caption>2 records</caption>
-<thead>
-<tr class="header">
-<th align="right">numbers</th>
-<th align="left">letters</th>
-<th align="right">n2</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="right">1</td>
-<td align="left">A</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="right">4</td>
-<td align="left">D</td>
-<td align="right">4</td>
-</tr>
-</tbody>
-</table>
-</div>
-<p>The updates can also be conditionals.</p>
-<pre class="sql"><code>UPDATE tbl 
-SET n2 = numbers * 2
-WHERE letters = &#39;A&#39;;</code></pre>
-<pre class="sql"><code>SELECT *
-FROM tbl</code></pre>
-<div class="knitsql-table">
-<table>
-<caption>2 records</caption>
-<thead>
-<tr class="header">
-<th align="right">numbers</th>
-<th align="left">letters</th>
-<th align="right">n2</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="right">1</td>
-<td align="left">A</td>
-<td align="right">2</td>
-</tr>
-<tr class="even">
-<td align="right">4</td>
-<td align="left">D</td>
-<td align="right">4</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div id="enforcing-uniqueness-in-the-columns" class="section level1">
-<h1>Enforcing uniqueness in the columns</h1>
-<p>This is most common when we have an ID column where duplicates are
-not allowed.</p>
-<pre class="sql"><code>CREATE TABLE uniquetbl (
-  ID INT NOT NULL UNIQUE, 
-  letters VARCHAR(10)
-);</code></pre>
-<pre class="sql"><code>/* This works */
-INSERT INTO uniquetbl
- (ID, letters)
-VALUES
- (1, &quot;A&quot;),
- (2, &quot;B&quot;),
- (3, &quot;C&quot;);</code></pre>
-<pre class="sql"><code>/* But this will create an error */
-INSERT INTO uniquetbl
- (ID, letters)
-VALUES
- (1, &quot;D&quot;);</code></pre>
-<pre><code>## Error: UNIQUE constraint failed: uniquetbl.ID</code></pre>
+<div id="why-i-am-making-this-site" class="section level1">
+<h1>Why I am making this site?</h1>
+<p>I want this to be a personal repository of SQL codes that I write for
+my own future references. Unlike other online tutorials, I have taken
+some efforts to make sure this site is fully reproducible (with some
+basic R setups).</p>
 </div>
 
 

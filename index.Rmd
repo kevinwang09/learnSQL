@@ -1,0 +1,9 @@
+---
+title: "Learn SQL"
+output: html_document
+author: Kevin Wang Ph.D.
+---
+
+# Why I am making this site?
+
+I want this to be a personal repository of SQL codes that I write for my own future references. Unlike other online tutorials, I have taken some efforts to make sure this site is fully reproducible (with some basic R setups).

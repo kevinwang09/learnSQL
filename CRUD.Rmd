@@ -1,0 +1,158 @@
+---
+title: "Create, review, update and delete"
+author: "Kevin Wang"
+date: "19 Nov 2022"
+output: html_document
+---
+
+# Setting up connection (in `RSQLite`)
+
+This chunk of code will take the in-memory data and allow this data to be queried exactly like a SQL database. 
+
+```{r, warning=FALSE, message=FALSE}
+library(dplyr)
+library(DBI)
+library(tidyverse)
+# Create an ephemeral in-memory RSQLite database
+con = dbConnect(RSQLite::SQLite(), ":memory:")
+# tbl = tibble(
+#   numbers = 1:5, 
+#   letters = letters[1:5])
+dbListTables(con)
+
+# dbWriteTable(con, "tbl", tbl)
+# dbListTables(con)
+# dbListFields(con, "tbl")
+```
+
+
+# Creating a table
+
+```{sql, connection=con}
+/*Creating a table called tbl, with the columns numbers and letters*/
+
+CREATE TABLE tbl (
+  numbers INT, 
+  letters VARCHAR(10)
+);
+```
+
+```{sql, connection=con}
+INSERT INTO tbl
+ (numbers, letters)
+VALUES
+ (1, "A"),
+ (2, "B"),
+ (3, "C");
+```
+
+```{sql, connection=con}
+SELECT *
+FROM tbl;
+```
+
+# Inserting rows
+
+```{sql, connection=con}
+INSERT INTO tbl
+ (numbers, letters)
+VALUES
+ (4, "D");
+```
+
+```{sql, connection=con}
+SELECT *
+FROM tbl;
+```
+
+# Editing rows
+
+```{sql, connection=con}
+UPDATE tbl
+SET 
+  letters = 'Unknown'
+WHERE 
+  numbers IN (2, 3)
+```
+
+```{sql, connection=con}
+SELECT *
+FROM tbl;
+```
+
+# Deleting rows
+
+```{sql, connection=con}
+DELETE FROM tbl WHERE letters = 'Unknown'
+```
+
+```{sql, connection=con}
+SELECT *
+FROM tbl;
+```
+
+# Adding a new column
+
+This initiates a new column. 
+
+```{sql, connection=con}
+ALTER TABLE tbl
+  ADD n2 DECIMAL (10, 2);
+```
+```{sql, connection=con}
+SELECT *
+FROM tbl
+```
+`UPDATE...SET...` allows one to set values for the columns.
+
+```{sql, connection=con}
+UPDATE tbl 
+SET n2 = numbers;
+```
+
+```{sql, connection=con}
+SELECT *
+FROM tbl
+```
+
+The updates can also be conditionals. 
+
+```{sql, connection=con}
+UPDATE tbl 
+SET n2 = numbers * 2
+WHERE letters = 'A';
+```
+
+```{sql, connection=con}
+SELECT *
+FROM tbl
+```
+
+# Enforcing uniqueness in the columns
+
+This is most common when we have an ID column where duplicates are not allowed. 
+
+```{sql, connection=con}
+CREATE TABLE uniquetbl (
+  ID INT NOT NULL UNIQUE, 
+  letters VARCHAR(10)
+);
+```
+
+```{sql, connection=con}
+/* This works */
+INSERT INTO uniquetbl
+ (ID, letters)
+VALUES
+ (1, "A"),
+ (2, "B"),
+ (3, "C");
+```
+
+```{sql, connection=con, error=TRUE}
+/* But this will create an error */
+INSERT INTO uniquetbl
+ (ID, letters)
+VALUES
+ (1, "D");
+```

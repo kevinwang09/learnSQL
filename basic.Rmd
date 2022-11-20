@@ -1,0 +1,244 @@
+---
+title: "Basic operations"
+author: "Kevin Wang"
+date: "20 Nov 2022"
+output: html_document
+---
+
+# Data preparation in `R`
+
+Evaluated only once to create a CSV file.
+
+```{r, eval = FALSE}
+library(palmerpenguins)
+library(tidyverse)
+readr::write_csv(x = penguins, file = "data/penguins.csv")
+```
+
+# Setting up connection (in `RSQlite`)
+
+This chunk of code will take the in-memory data and allow this data to be queried exactly like a SQL database. 
+
+The print methods for `R` is different to that of `SQL`. 
+
+```{r, warning=FALSE, message=FALSE}
+library(dplyr)
+library(DBI)
+# Create an ephemeral in-memory RSQLite database
+con <- dbConnect(RSQLite::SQLite(), ":memory:")
+penguins = readr::read_csv(file = "data/penguins.csv")
+dbListTables(con)
+
+dbWriteTable(con, "penguins", penguins)
+dbListTables(con)
+dbListFields(con, "penguins")
+```
+
+# Selecting specific columns
+
+```{sql, connection=con}
+SELECT species, island 
+FROM penguins
+```
+
+## Select all columns
+
+```{sql, connection=con}
+SELECT * 
+FROM penguins;
+```
+
+## Selecting distinct entries from 
+
+```{sql, connection=con}
+SELECT DISTINCT species 
+FROM penguins;
+```
+
+```{sql, connection=con}
+SELECT DISTINCT species, island 
+FROM penguins;
+```
+
+# Counting number of distinct entries
+
+```{sql, connection=con}
+SELECT species, 
+       COUNT(species) AS n
+FROM penguins
+GROUP BY species;
+```
+
+# Sorting
+
+```{sql, connection=con}
+SELECT species, 
+       COUNT(*)*1.0/(SELECT COUNT(*) AS total FROM penguins) AS proportion
+FROM penguins
+GROUP BY species 
+ORDER BY proportion DESC
+```
+
+
+# Limited rows
+
+## Filtering for the first few rows
+
+```{sql, connection=con}
+SELECT *
+FROM penguins
+LIMIT 10
+```
+
+## Filtering for the first few rows ordered by some variable
+
+```{sql, connection=con}
+SELECT * 
+FROM penguins
+ORDER BY body_mass_g DESC
+LIMIT 10
+```
+
+
+# Filtering
+
+## Filtering for rows
+
+`WHERE` is the keyword for handling both numeric and character columns. It should evaluate to some boolean value. 
+
+## Numeric columns
+
+```{sql, connection=con}
+SELECT species, 
+       COUNT(species) AS n
+FROM penguins
+WHERE body_mass_g > 4000
+GROUP BY species
+```
+
+The `BETWEEN` keyword is useful.
+
+```{sql, connection=con}
+SELECT species, 
+       COUNT(species) AS n
+FROM penguins
+WHERE body_mass_g 
+BETWEEN 4000 AND 4500
+GROUP BY species
+```
+
+## Categorical columns
+
+The major difference is that R/Python compared to SQL is that the former use double equal sign `==` whereas `SQL` uses a single equal sign `=` when subsetting categorical variables. 
+
+```{sql, connection=con}
+SELECT species, 
+       COUNT(species) AS n
+FROM penguins
+WHERE island = 'Biscoe'
+GROUP BY species
+```
+
+```{sql, connection=con}
+SELECT species, 
+       COUNT(species) AS n
+FROM penguins
+WHERE island IN ("Biscoe", "Dream")
+GROUP BY species
+```
+
+# Missing values 
+
+`R` uses `NA` to encode missing values. 
+
+`SQL` uses `NULL` to encode missing values, which is not to be confused with `NULL` in `R` or `Python`.
+
+```{sql, connection=con}
+SELECT species,
+       COUNT(species) AS n
+FROM penguins
+WHERE sex IS NULL
+GROUP BY species
+```
+
+```{sql, connection=con}
+SELECT species,
+       COUNT(species) AS n
+FROM penguins
+WHERE sex IS NOT NULL
+GROUP BY species
+```
+
+# String operations
+
+The first task aims to tally the species of penguins, for entries with island begin with the characters "Torg".
+
+```{sql, connection=con}
+SELECT species, 
+       COUNT(species) AS n
+FROM penguins
+WHERE island LIKE "Torg%"
+GROUP BY species
+```
+
+The second task aims to tally the species of penguins, for entries with island's second character equal to "r".
+
+```{sql, connection=con}
+SELECT species, 
+       COUNT(species) AS n
+FROM penguins
+WHERE island LIKE "_r%"
+GROUP BY species
+```
+
+# Summarisation
+
+```{sql, connection=con}
+SELECT species, 
+       MIN(body_mass_g) AS min_mass,
+       AVG(body_mass_g) AS mean_mass,
+       MAX(body_mass_g) AS max_mass,
+       STDEV(body_mass_g) AS sd_mass,
+       AVG(body_mass_g/1000.0) AS mass_kg
+FROM penguins
+GROUP BY species
+```
+
+
+# Proportion calculation
+
+In the code below, we are calculating the frequencies of penguins and the percentages. Notice that this percentage is calculated with respect to the entire penguin population, i.e. the total is needed. 
+
+In `SQL`, the output will be of same variable type as the input, so the multiplication of `1.0` is necessary to make the outputs come out as decimals rather than being rounded to an integer.
+
+```{sql, connection=con}
+SELECT species, 
+       COUNT(*)*1.0/SUM(COUNT(*)) OVER () AS proportion
+FROM penguins
+GROUP BY species 
+ORDER BY proportion
+```
+
+Alternatively:
+
+```{sql, connection=con}
+SELECT species, 
+       COUNT(*)*1.0/(SELECT COUNT(*) AS total FROM penguins) AS proportion
+FROM penguins
+GROUP BY species 
+ORDER BY proportion DESC
+```
+
+# Filtering using summary statistics
+
+In `SQL`, the `WHERE` function cannot operate on summary statistics, this is a job for `HAVING`.
+
+In the task below, we will group by the species and sex of the penguins and filter for penguins species/sex combo that has an average mass of greater than 4700 grams. The result should be Gentoo male penguins. 
+
+```{sql, connection=con}
+SELECT *
+FROM penguins
+WHERE body_mass_g IS NOT NULL
+GROUP BY species, sex
+HAVING AVG(body_mass_g) >= 4700;
+```

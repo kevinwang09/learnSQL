@@ -1,0 +1,127 @@
+---
+title: "Joining datasets"
+author: "Kevin Wang"
+date: "20 Nov 2022"
+output: html_document
+---
+
+# Data preparation 
+
+Evaluated only once to create a CSV file.
+
+```{r, eval = FALSE}
+library(nycflights13)
+library(tidyverse)
+set.seed(123)
+readr::write_csv(x = nycflights13::airports %>% 
+                   dplyr::select(faa, name), 
+                 file = "data/airports.csv")
+readr::write_csv(x = nycflights13::airlines, file = "data/airlines.csv")
+readr::write_csv(x = nycflights13::flights %>% 
+                   dplyr::slice(1:100) %>% 
+                   dplyr::select(carrier, flight, tailnum, origin, dest), 
+                 file = "data/flights.csv")
+```
+
+This chunk of code will take the in-memory data and allow this data to be queried exactly like a SQL database. 
+
+```{r, warning=FALSE, message=FALSE}
+library(dplyr)
+library(DBI)
+# Create an ephemeral in-memory RSQLite database
+con <- dbConnect(RSQLite::SQLite(), ":memory:")
+airports = readr::read_csv(file = "data/airports.csv")
+airlines = readr::read_csv(file = "data/airlines.csv")
+flights = readr::read_csv(file = "data/flights.csv")
+dbListTables(con)
+
+dbWriteTable(con, "airports", airports)
+dbWriteTable(con, "airlines", airlines)
+dbWriteTable(con, "flights", flights)
+dbListTables(con)
+dbListFields(con, "airports")
+dbListFields(con, "airlines")
+dbListFields(con, "flights")
+```
+
+There are three data sets in this page: airports, airlines and flights. 
+
+# Inner join
+
+`SQL` needs explicitly specify the common column by name on both data.
+
+```{sql, connection=con}
+SELECT *
+FROM flights
+INNER JOIN airlines
+  ON flights.carrier = airlines.carrier
+```
+
+# AS: Aliasing table names
+
+We can freely rename the naming of variables in `R`. 
+
+```{sql, connection=con}
+SELECT *
+FROM flights AS f
+INNER JOIN airlines AS a
+  ON f.carrier = a.carrier
+```
+
+# Multiple inner joins 
+
+One of the annoying thing is that `SQL` allows columns with the same name, so some manual renaming is necessary to avoid confusion in the final output. We will do this in the next section.
+
+In the following example, flight data is extracted. Each flight is then joined with the `airlines` table via the `carrier` column, and also joined with the `airports` table with the `origin` = `faa` specification. 
+
+```{sql, connection=con}
+SELECT *
+FROM flights
+INNER JOIN airlines
+  ON flights.carrier = airlines.carrier
+INNER JOIN airports
+  ON flights.origin = airports.faa
+```
+
+# Renaming/subquery during join 
+
+Sometimes, joining entire tables can be inefficient, especially if not all columns are needed. Thus, during the inner join call, `SELECT ... FROM` can be invoked within brackets and this subquery can also be aliased. 
+
+```{sql, connection=con}
+SELECT *
+FROM flights
+INNER JOIN (SELECT carrier, name AS carrier_name FROM airlines) AS rap
+  ON flights.carrier = rap.carrier
+INNER JOIN (SELECT faa, name AS airport_name FROM airports) AS ral
+  ON flights.origin = ral.faa
+```
+
+# Case when
+
+Case when allows for alternate coding for some categorical information. 
+
+```{sql, connection=con}
+SELECT *, 
+  CASE WHEN origin = "JFK" THEN 4
+       WHEN origin = "EWR" THEN 3
+       WHEN origin = "LGA" THEN 2
+       ELSE 0 END
+       AS runways
+FROM flights;
+```
+
+# SELECT INTO to create a temporary table 
+
+Unfortunately, the in-memory `RSQLite` set-up for this worksheet does not allow me to execute this SQL command. 
+
+```{sql, eval=FALSE}
+-- Creating frequency of carrier summary table
+SELECT carrier,
+       COUNT(carrier) AS n
+INTO freq_carrier
+FROM flights
+GROUP BY carrier
+ORDER BY n DESC;
+-- Joining that with the airline data
+INNER JOIN airlines ON freq_carrier.carrier = airlines.carriers
+```

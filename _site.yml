@@ -1,0 +1,30 @@
+# This file controls the layout of the website. 
+navbar:
+  icon: fa-home
+  title: "Learning SQL"
+  left:
+    - text: "Basics"
+      menu:
+        - text: Create, review, update, delete
+          href: https://kevinwang09.github.io/learnSQL/CRUD.html
+        - text: Basic operations
+          href: https://kevinwang09.github.io/learnSQL/basics.html
+        - text: Join operations
+          href: https://kevinwang09.github.io/learnSQL/join.html
+  right:
+    - text: "Source code"
+      icon: fa-code
+      href: https://github.com/kevinwang09/learnSQL
+    - text: "About me"
+      icon: fa-user-tie
+      href: https://kevinwangstats.com
+output_dir: "."
+exclude: ["README*"]
+output:
+  html_document:
+    theme: paper
+    highlight: textmate
+    css: "style.css"
+    df_print: paged
+    toc: true
+    toc_depth: 2

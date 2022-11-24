@@ -11,6 +11,10 @@ navbar:
           href: https://kevinwang09.github.io/learnSQL/basic.html
         - text: Join operations
           href: https://kevinwang09.github.io/learnSQL/join.html
+    - text: "Intermediates"
+      menu:
+        - text: Subqueries
+          href: https://kevinwang09.github.io/learnSQL/subqueries.html
   right:
     - text: "Source code"
       icon: fa-code

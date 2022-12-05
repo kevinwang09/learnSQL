@@ -1,0 +1,83 @@
+---
+title: "Window"
+author: "Kevin Wang"
+date: "5 December 2022"
+output: html_document
+---
+
+# Data preparation 
+
+```{r, eval = FALSE}
+library(nycflights13)
+library(tidyverse)
+set.seed(123)
+readr::write_csv(x = nycflights13::airports %>% 
+                   dplyr::select(faa, name), 
+                 file = "data/airports.csv")
+readr::write_csv(x = nycflights13::airlines, file = "data/airlines.csv")
+readr::write_csv(x = nycflights13::flights %>% 
+                   dplyr::sample_n(100) %>% 
+                   dplyr::mutate(date = paste(year, month, day, sep = "/") %>% lubridate::ymd()) %>% 
+                   dplyr::select(date, carrier, flight, dep_delay, origin, dest), 
+                 file = "data/flights_dates.csv")
+```
+
+```{r, warning=FALSE, message=FALSE}
+library(dplyr)
+library(DBI)
+# Create an ephemeral in-memory RSQLite database
+con <- dbConnect(RSQLite::SQLite(), ":memory:")
+flights = readr::read_csv(file = "data/flights_dates.csv")
+dbListTables(con)
+
+dbWriteTable(con, "flights", flights)
+dbListTables(con)
+dbListFields(con, "flights")
+```
+
+# Adding summary statistics over the entire data (`OVER`)
+
+The OVER clause can essentially add columns to the output data. Used just by itself, without any partitioning, the summary statistic over the entire column will be created as a new column. This can be useful in the case that we want to perform some comparisons between the group-by level statistics and the overall statistics. 
+
+In the following example, we calculate the average delay values by each carrier using the AVG and GROUP BY clauses. But we can also use the OVER clause to bypass the GROUP BY behaviour and create a column of mean delays across all flights. 
+
+```{sql, connection=con}
+SELECT carrier, 
+       AVG(dep_delay) AS carrier_mean_delay,
+       AVG(dep_delay) OVER() AS overall_mean_delay
+FROM flights
+GROUP BY carrier
+```
+
+# Summary statistics partitioned by some variables (`PARTITION BY`)
+
+The PARTITION BY option makes OVER more powerful: it can act like a subquery in the sense that summary statistics are grouped. 
+
+For the query below, notice how the average delays are **specific** to the carrier and the origin. 
+
+https://www.sqlservercentral.com/articles/understanding-the-over-clause provides extra examples. 
+
+```{sql, connection=con}
+SELECT carrier, 
+  origin,
+  AVG(dep_delay) OVER(PARTITION BY carrier) AS carrier_delay,
+  AVG(dep_delay) OVER(PARTITION BY origin) AS origin_delay
+FROM flights
+WHERE carrier IN ('AA', 'B6')
+GROUP BY carrier, origin
+```
+
+# Cumulative sum/average
+
+This task is usually fairly straight forward in other languages, but in SQL, some specific keywords will be needed. 
+
+The cumulative sum is specified as the average values from the current row and all the preceding rows of the data. The ordering of the rows is done by some other variable (in this example, the flight dates).  
+
+```{sql, connection=con}
+SELECT carrier, 
+  date,
+  SUM(dep_delay) OVER(ORDER BY date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_total_delay
+FROM flights
+GROUP BY carrier
+ORDER BY carrier, date;
+```

@@ -11,9 +11,9 @@
 
 <meta name="author" content="Kevin Wang" />
 
-<meta name="date" content="2022-11-20" />
+<meta name="date" content="2022-12-05" />
 
-<title>Subqueries</title>
+<title>Window</title>
 
 <script src="site_libs/header-attrs-2.15/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -314,9 +314,9 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Subqueries</h1>
+<h1 class="title toc-ignore">Window</h1>
 <h4 class="author">Kevin Wang</h4>
-<h4 class="date">20 Nov 2022</h4>
+<h4 class="date">5 December 2022</h4>
 
 </div>
 
@@ -324,14 +324,21 @@ $(document).ready(function () {
 <ul>
 <li><a href="#data-preparation" id="toc-data-preparation">Data
 preparation</a></li>
-<li><a href="#with-statement" id="toc-with-statement"><code>WITH</code>
-statement</a></li>
+<li><a href="#adding-summary-statistics-over-the-entire-data-over"
+id="toc-adding-summary-statistics-over-the-entire-data-over">Adding
+summary statistics over the entire data (<code>OVER</code>)</a></li>
+<li><a
+href="#summary-statistics-partitioned-by-some-variables-partition-by"
+id="toc-summary-statistics-partitioned-by-some-variables-partition-by">Summary
+statistics partitioned by some variables
+(<code>PARTITION BY</code>)</a></li>
+<li><a href="#cumulative-sumaverage"
+id="toc-cumulative-sumaverage">Cumulative sum/average</a></li>
 </ul>
 </div>
 
 <div id="data-preparation" class="section level1">
 <h1>Data preparation</h1>
-<p>Evaluated only once to create a CSV file.</p>
 <pre class="r"><code>library(nycflights13)
 library(tidyverse)
 set.seed(123)
@@ -340,7 +347,7 @@ readr::write_csv(x = nycflights13::airports %&gt;%
                  file = &quot;data/airports.csv&quot;)
 readr::write_csv(x = nycflights13::airlines, file = &quot;data/airlines.csv&quot;)
 readr::write_csv(x = nycflights13::flights %&gt;% 
-                   dplyr::slice(1:100) %&gt;% 
+                   dplyr::sample_n(100) %&gt;% 
                    dplyr::mutate(date = paste(year, month, day, sep = &quot;/&quot;) %&gt;% lubridate::ymd()) %&gt;% 
                    dplyr::select(date, carrier, flight, dep_delay, origin, dest), 
                  file = &quot;data/flights_dates.csv&quot;)</code></pre>
@@ -348,64 +355,243 @@ readr::write_csv(x = nycflights13::flights %&gt;%
 library(DBI)
 # Create an ephemeral in-memory RSQLite database
 con &lt;- dbConnect(RSQLite::SQLite(), &quot;:memory:&quot;)
-airports = readr::read_csv(file = &quot;data/airports.csv&quot;)
-airlines = readr::read_csv(file = &quot;data/airlines.csv&quot;)
 flights = readr::read_csv(file = &quot;data/flights_dates.csv&quot;)
 dbListTables(con)</code></pre>
 <pre><code>## character(0)</code></pre>
-<pre class="r"><code>dbWriteTable(con, &quot;airports&quot;, airports)
-dbWriteTable(con, &quot;airlines&quot;, airlines)
-dbWriteTable(con, &quot;flights&quot;, flights)
+<pre class="r"><code>dbWriteTable(con, &quot;flights&quot;, flights)
 dbListTables(con)</code></pre>
-<pre><code>## [1] &quot;airlines&quot; &quot;airports&quot; &quot;flights&quot;</code></pre>
-<pre class="r"><code>dbListFields(con, &quot;airports&quot;)</code></pre>
-<pre><code>## [1] &quot;faa&quot;  &quot;name&quot;</code></pre>
-<pre class="r"><code>dbListFields(con, &quot;airlines&quot;)</code></pre>
-<pre><code>## [1] &quot;carrier&quot; &quot;name&quot;</code></pre>
+<pre><code>## [1] &quot;flights&quot;</code></pre>
 <pre class="r"><code>dbListFields(con, &quot;flights&quot;)</code></pre>
 <pre><code>## [1] &quot;date&quot;      &quot;carrier&quot;   &quot;flight&quot;    &quot;dep_delay&quot; &quot;origin&quot;    &quot;dest&quot;</code></pre>
 </div>
-<div id="with-statement" class="section level1">
-<h1><code>WITH</code> statement</h1>
-<p>This example is a little bit basic. However, I think it illustrate an
-important difference between
-<code>R-dplyr</code>/<code>Python-pandas</code>and <code>SQL</code>. The
-syntax in R/Python is largely consistent and linear, which makes it more
-human-readable. Whereas <code>SQL</code> is a bit more cumbersome. E.g.
-<code>WHERE</code> and <code>HAVING</code> operates on records and
-summary of records respectively when <code>dplyr</code> simply uses
-<code>filter</code>.</p>
-<!-- ```{sql, connection=con} -->
-<!-- SELECT f.carrier, AVG(f.dep_delay) AS mean_dep_delay -->
-<!-- FROM flights AS f -->
-<!-- INNER JOIN airlines AS a -->
-<!--   ON f.carrier = a.carrier -->
-<!-- GROUP BY f.carrier -->
-<!-- ``` -->
-<pre class="sql"><code>WITH t as (SELECT f.carrier, a.name, AVG(f.dep_delay) AS mean_dep_delay
-      FROM flights AS f
-      INNER JOIN airlines AS a
-        ON f.carrier = a.carrier
-      GROUP BY f.carrier)
-      
-SELECT *
-FROM t
-WHERE t.mean_dep_delay = (SELECT MAX(t.mean_dep_delay) FROM t);</code></pre>
+<div id="adding-summary-statistics-over-the-entire-data-over"
+class="section level1">
+<h1>Adding summary statistics over the entire data
+(<code>OVER</code>)</h1>
+<p>The OVER clause can essentially add columns to the output data. Used
+just by itself, without any partitioning, the summary statistic over the
+entire column will be created as a new column. This can be useful in the
+case that we want to perform some comparisons between the group-by level
+statistics and the overall statistics.</p>
+<p>In the following example, we calculate the average delay values by
+each carrier using the AVG and GROUP BY clauses. But we can also use the
+OVER clause to bypass the GROUP BY behaviour and create a column of mean
+delays across all flights.</p>
+<pre class="sql"><code>SELECT carrier, 
+       AVG(dep_delay) AS carrier_mean_delay,
+       AVG(dep_delay) OVER() AS overall_mean_delay
+FROM flights
+GROUP BY carrier</code></pre>
 <div class="knitsql-table">
 <table>
-<caption>1 records</caption>
+<caption>Displaying records 1 - 10</caption>
 <thead>
 <tr class="header">
 <th align="left">carrier</th>
-<th align="left">name</th>
-<th align="right">mean_dep_delay</th>
+<th align="right">carrier_mean_delay</th>
+<th align="right">overall_mean_delay</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
+<td align="left">AA</td>
+<td align="right">-0.5882353</td>
+<td align="right">-1.909091</td>
+</tr>
+<tr class="even">
+<td align="left">AS</td>
+<td align="right">-1.0000000</td>
+<td align="right">-1.909091</td>
+</tr>
+<tr class="odd">
+<td align="left">B6</td>
+<td align="right">-1.9200000</td>
+<td align="right">-1.909091</td>
+</tr>
+<tr class="even">
+<td align="left">DL</td>
+<td align="right">-2.7692308</td>
+<td align="right">-1.909091</td>
+</tr>
+<tr class="odd">
 <td align="left">EV</td>
-<td align="left">ExpressJet Airlines Inc.</td>
-<td align="right">5</td>
+<td align="right">5.0000000</td>
+<td align="right">-1.909091</td>
+</tr>
+<tr class="even">
+<td align="left">FL</td>
+<td align="right">-3.0000000</td>
+<td align="right">-1.909091</td>
+</tr>
+<tr class="odd">
+<td align="left">MQ</td>
+<td align="right">4.8333333</td>
+<td align="right">-1.909091</td>
+</tr>
+<tr class="even">
+<td align="left">UA</td>
+<td align="right">2.1538462</td>
+<td align="right">-1.909091</td>
+</tr>
+<tr class="odd">
+<td align="left">US</td>
+<td align="right">-4.2000000</td>
+<td align="right">-1.909091</td>
+</tr>
+<tr class="even">
+<td align="left">VX</td>
+<td align="right">-1.5000000</td>
+<td align="right">-1.909091</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="summary-statistics-partitioned-by-some-variables-partition-by"
+class="section level1">
+<h1>Summary statistics partitioned by some variables
+(<code>PARTITION BY</code>)</h1>
+<p>The PARTITION BY option makes OVER more powerful: it can act like a
+subquery in the sense that summary statistics are grouped.</p>
+<p>For the query below, notice how the average delays are
+<strong>specific</strong> to the carrier and the origin.</p>
+<p><a
+href="https://www.sqlservercentral.com/articles/understanding-the-over-clause"
+class="uri">https://www.sqlservercentral.com/articles/understanding-the-over-clause</a>
+provides extra examples.</p>
+<pre class="sql"><code>SELECT carrier, 
+  origin,
+  AVG(dep_delay) OVER(PARTITION BY carrier) AS carrier_delay,
+  AVG(dep_delay) OVER(PARTITION BY origin) AS origin_delay
+FROM flights
+WHERE carrier IN (&#39;AA&#39;, &#39;B6&#39;)
+GROUP BY carrier, origin</code></pre>
+<div class="knitsql-table">
+<table>
+<caption>6 records</caption>
+<thead>
+<tr class="header">
+<th align="left">carrier</th>
+<th align="left">origin</th>
+<th align="right">carrier_delay</th>
+<th align="right">origin_delay</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">AA</td>
+<td align="left">EWR</td>
+<td align="right">-1.333333</td>
+<td align="right">-4.5</td>
+</tr>
+<tr class="even">
+<td align="left">AA</td>
+<td align="left">JFK</td>
+<td align="right">-1.333333</td>
+<td align="right">0.5</td>
+</tr>
+<tr class="odd">
+<td align="left">AA</td>
+<td align="left">LGA</td>
+<td align="right">-1.333333</td>
+<td align="right">-1.0</td>
+</tr>
+<tr class="even">
+<td align="left">B6</td>
+<td align="left">EWR</td>
+<td align="right">-2.000000</td>
+<td align="right">-4.5</td>
+</tr>
+<tr class="odd">
+<td align="left">B6</td>
+<td align="left">JFK</td>
+<td align="right">-2.000000</td>
+<td align="right">0.5</td>
+</tr>
+<tr class="even">
+<td align="left">B6</td>
+<td align="left">LGA</td>
+<td align="right">-2.000000</td>
+<td align="right">-1.0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="cumulative-sumaverage" class="section level1">
+<h1>Cumulative sum/average</h1>
+<p>This task is usually fairly straight forward in other languages, but
+in SQL, some specific keywords will be needed.</p>
+<p>The cumulative sum is specified as the average values from the
+current row and all the preceding rows of the data. The ordering of the
+rows is done by some other variable (in this example, the flight
+dates).</p>
+<pre class="sql"><code>SELECT carrier, 
+  date,
+  SUM(dep_delay) OVER(ORDER BY date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_total_delay
+FROM flights
+GROUP BY carrier
+ORDER BY carrier, date;</code></pre>
+<div class="knitsql-table">
+<table>
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th align="left">carrier</th>
+<th align="right">date</th>
+<th align="right">running_total_delay</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">AA</td>
+<td align="right">15706</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">AS</td>
+<td align="right">15706</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">B6</td>
+<td align="right">15706</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">DL</td>
+<td align="right">15706</td>
+<td align="right">-6</td>
+</tr>
+<tr class="odd">
+<td align="left">EV</td>
+<td align="right">15706</td>
+<td align="right">-9</td>
+</tr>
+<tr class="even">
+<td align="left">FL</td>
+<td align="right">15706</td>
+<td align="right">-12</td>
+</tr>
+<tr class="odd">
+<td align="left">MQ</td>
+<td align="right">15706</td>
+<td align="right">-12</td>
+</tr>
+<tr class="even">
+<td align="left">UA</td>
+<td align="right">15706</td>
+<td align="right">-10</td>
+</tr>
+<tr class="odd">
+<td align="left">US</td>
+<td align="right">15706</td>
+<td align="right">-18</td>
+</tr>
+<tr class="even">
+<td align="left">VX</td>
+<td align="right">15706</td>
+<td align="right">-20</td>
 </tr>
 </tbody>
 </table>

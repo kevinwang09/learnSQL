@@ -28,7 +28,7 @@ jobs:
           sudo apt-get install libcurl4-openssl-dev
           Rscript -e 'install.packages(c("remotes", "rmarkdown", "knitr", "tidyverse",
           "DBI", "RSQLite", "nycflights13", "palmerpenguins"))'
-        
+          Rscript -e 'rmarkdown::render_site(input = ".")'
 
       - name: Deploy site
         run: |

@@ -264,10 +264,10 @@ $(document).ready(function () {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="https://kevinwang09.github.io/learnSQL/CRUD.html">Create, review, update, delete</a>
+      <a href="https://kevinwang09.github.io/learnSQL/basic.html">Basic operations</a>
     </li>
     <li>
-      <a href="https://kevinwang09.github.io/learnSQL/basic.html">Basic operations</a>
+      <a href="https://kevinwang09.github.io/learnSQL/CRUD.html">Table - Create, review, update, delete</a>
     </li>
     <li>
       <a href="https://kevinwang09.github.io/learnSQL/join.html">Join operations</a>
@@ -282,7 +282,7 @@ $(document).ready(function () {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="https://kevinwang09.github.io/learnSQL/subqueries.html">Subqueries</a>
+      <a href="https://kevinwang09.github.io/learnSQL/subqueries.html">Subqueries - case when, with</a>
     </li>
     <li>
       <a href="https://kevinwang09.github.io/learnSQL/window.html">Window</a>
@@ -324,6 +324,8 @@ $(document).ready(function () {
 <ul>
 <li><a href="#data-preparation" id="toc-data-preparation">Data
 preparation</a></li>
+<li><a href="#case-when"
+id="toc-case-when"><code>CASE WHEN</code></a></li>
 <li><a href="#with-statement" id="toc-with-statement"><code>WITH</code>
 statement</a></li>
 </ul>
@@ -342,7 +344,7 @@ readr::write_csv(x = nycflights13::airlines, file = &quot;data/airlines.csv&quot
 readr::write_csv(x = nycflights13::flights %&gt;% 
                    dplyr::slice(1:100) %&gt;% 
                    dplyr::mutate(date = paste(year, month, day, sep = &quot;/&quot;) %&gt;% lubridate::ymd()) %&gt;% 
-                   dplyr::select(date, carrier, flight, dep_delay, origin, dest), 
+                   dplyr::select(date, carrier, flight, arr_delay, dep_delay, origin, dest), 
                  file = &quot;data/flights_dates.csv&quot;)</code></pre>
 <pre class="r"><code>library(dplyr)
 library(DBI)
@@ -363,7 +365,151 @@ dbListTables(con)</code></pre>
 <pre class="r"><code>dbListFields(con, &quot;airlines&quot;)</code></pre>
 <pre><code>## [1] &quot;carrier&quot; &quot;name&quot;</code></pre>
 <pre class="r"><code>dbListFields(con, &quot;flights&quot;)</code></pre>
-<pre><code>## [1] &quot;date&quot;      &quot;carrier&quot;   &quot;flight&quot;    &quot;dep_delay&quot; &quot;origin&quot;    &quot;dest&quot;</code></pre>
+<pre><code>## [1] &quot;date&quot;      &quot;carrier&quot;   &quot;flight&quot;    &quot;arr_delay&quot; &quot;dep_delay&quot; &quot;origin&quot;   
+## [7] &quot;dest&quot;</code></pre>
+</div>
+<div id="case-when" class="section level1">
+<h1><code>CASE WHEN</code></h1>
+<p>This function is rather straight-forward. The syntax generally
+follows that: CASE WHEN logical THEN encoding ELSE encoding END.</p>
+<p>In general, it changes how variables are encoded and will allow us to
+perform aggregation.</p>
+<pre class="sql"><code>SELECT dep_delay, arr_delay
+FROM flights as f</code></pre>
+<div class="knitsql-table">
+<table>
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th align="right">dep_delay</th>
+<th align="right">arr_delay</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">2</td>
+<td align="right">11</td>
+</tr>
+<tr class="even">
+<td align="right">4</td>
+<td align="right">20</td>
+</tr>
+<tr class="odd">
+<td align="right">2</td>
+<td align="right">33</td>
+</tr>
+<tr class="even">
+<td align="right">-1</td>
+<td align="right">-18</td>
+</tr>
+<tr class="odd">
+<td align="right">-6</td>
+<td align="right">-25</td>
+</tr>
+<tr class="even">
+<td align="right">-4</td>
+<td align="right">12</td>
+</tr>
+<tr class="odd">
+<td align="right">-5</td>
+<td align="right">19</td>
+</tr>
+<tr class="even">
+<td align="right">-3</td>
+<td align="right">-14</td>
+</tr>
+<tr class="odd">
+<td align="right">-3</td>
+<td align="right">-8</td>
+</tr>
+<tr class="even">
+<td align="right">-2</td>
+<td align="right">8</td>
+</tr>
+</tbody>
+</table>
+</div>
+<pre class="sql"><code>SELECT CASE WHEN dep_delay &lt;= 0 AND arr_delay &gt;= 0 THEN &#39;left early, arrived late&#39;
+            WHEN dep_delay &gt;= 0 AND arr_delay &lt;= 0 THEN &#39;left late, arrived early&#39;
+            WHEN dep_delay &lt;= 0 AND arr_delay &lt;= 0 THEN &#39;left early, arrived early&#39;
+            WHEN dep_delay &gt;= 0 AND arr_delay &gt;= 0 THEN &#39;left late, arrived late&#39;
+            ELSE NULL END AS delay_patterns
+FROM flights as f</code></pre>
+<div class="knitsql-table">
+<table>
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th align="left">delay_patterns</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">left late, arrived late</td>
+</tr>
+<tr class="even">
+<td align="left">left late, arrived late</td>
+</tr>
+<tr class="odd">
+<td align="left">left late, arrived late</td>
+</tr>
+<tr class="even">
+<td align="left">left early, arrived early</td>
+</tr>
+<tr class="odd">
+<td align="left">left early, arrived early</td>
+</tr>
+<tr class="even">
+<td align="left">left early, arrived late</td>
+</tr>
+<tr class="odd">
+<td align="left">left early, arrived late</td>
+</tr>
+<tr class="even">
+<td align="left">left early, arrived early</td>
+</tr>
+<tr class="odd">
+<td align="left">left early, arrived early</td>
+</tr>
+<tr class="even">
+<td align="left">left early, arrived late</td>
+</tr>
+</tbody>
+</table>
+</div>
+<pre class="sql"><code>SELECT 
+  SUM(CASE WHEN dep_delay &lt;= 0 AND arr_delay &gt;= 0 THEN 1 ELSE 0 END) AS left_early_arrived_late,
+  SUM(CASE WHEN dep_delay &gt;= 0 AND arr_delay &lt;= 0 THEN 1 ELSE 0 END) AS left_late_arrived_early,
+  SUM(CASE WHEN dep_delay &lt;= 0 AND arr_delay &lt;= 0 THEN 1 ELSE 0 END) AS left_early_arrived_early,
+  SUM(CASE WHEN dep_delay &gt;= 0 AND arr_delay &gt;= 0 THEN 1 ELSE 0 END) AS left_late_arrived_late
+FROM flights as f</code></pre>
+<div class="knitsql-table">
+<table>
+<caption>1 records</caption>
+<colgroup>
+<col width="25%" />
+<col width="25%" />
+<col width="26%" />
+<col width="23%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="right">left_early_arrived_late</th>
+<th align="right">left_late_arrived_early</th>
+<th align="right">left_early_arrived_early</th>
+<th align="right">left_late_arrived_late</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">32</td>
+<td align="right">13</td>
+<td align="right">47</td>
+<td align="right">20</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div id="with-statement" class="section level1">
 <h1><code>WITH</code> statement</h1>
@@ -372,8 +518,9 @@ important difference between
 <code>R-dplyr</code>/<code>Python-pandas</code>and <code>SQL</code>. The
 syntax in R/Python is largely consistent and linear, which makes it more
 human-readable. Whereas <code>SQL</code> is a bit more cumbersome. E.g.
-<code>WHERE</code> and <code>HAVING</code> operates on records and
-summary of records respectively when <code>dplyr</code> simply uses
+<code>WHERE</code> and <code>HAVING</code> subset on
+<strong>records</strong> and <strong>summary of records</strong>
+respectively when <code>dplyr</code> simply uses
 <code>filter</code>.</p>
 <!-- ```{sql, connection=con} -->
 <!-- SELECT f.carrier, AVG(f.dep_delay) AS mean_dep_delay -->

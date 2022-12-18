@@ -20,7 +20,7 @@ readr::write_csv(x = nycflights13::airlines, file = "data/airlines.csv")
 readr::write_csv(x = nycflights13::flights %>% 
                    dplyr::slice(1:100) %>% 
                    dplyr::mutate(date = paste(year, month, day, sep = "/") %>% lubridate::ymd()) %>% 
-                   dplyr::select(date, carrier, flight, dep_delay, origin, dest), 
+                   dplyr::select(date, carrier, flight, arr_delay, dep_delay, origin, dest), 
                  file = "data/flights_dates.csv")
 ```
 
@@ -43,10 +43,40 @@ dbListFields(con, "airlines")
 dbListFields(con, "flights")
 ```
 
+# `CASE WHEN`
+
+This function is rather straight-forward. The syntax generally follows that: CASE WHEN logical THEN encoding ELSE encoding END.
+
+In general, it changes how variables are encoded and will allow us to perform aggregation.
+
+```{sql, connection=con}
+SELECT dep_delay, arr_delay
+FROM flights as f
+```
+
+
+```{sql, connection=con}
+SELECT CASE WHEN dep_delay <= 0 AND arr_delay >= 0 THEN 'left early, arrived late'
+            WHEN dep_delay >= 0 AND arr_delay <= 0 THEN 'left late, arrived early'
+            WHEN dep_delay <= 0 AND arr_delay <= 0 THEN 'left early, arrived early'
+            WHEN dep_delay >= 0 AND arr_delay >= 0 THEN 'left late, arrived late'
+            ELSE NULL END AS delay_patterns
+FROM flights as f
+```
+
+
+```{sql, connection=con}
+SELECT 
+  SUM(CASE WHEN dep_delay <= 0 AND arr_delay >= 0 THEN 1 ELSE 0 END) AS left_early_arrived_late,
+  SUM(CASE WHEN dep_delay >= 0 AND arr_delay <= 0 THEN 1 ELSE 0 END) AS left_late_arrived_early,
+  SUM(CASE WHEN dep_delay <= 0 AND arr_delay <= 0 THEN 1 ELSE 0 END) AS left_early_arrived_early,
+  SUM(CASE WHEN dep_delay >= 0 AND arr_delay >= 0 THEN 1 ELSE 0 END) AS left_late_arrived_late
+FROM flights as f
+```
 
 # `WITH` statement
 
-This example is a little bit basic. However, I think it illustrate an important difference between `R-dplyr`/`Python-pandas`and `SQL`. The syntax in R/Python is largely consistent and linear, which makes it more human-readable. Whereas `SQL` is a bit more cumbersome. E.g. `WHERE` and `HAVING` operates on records and summary of records respectively when `dplyr` simply uses `filter`. 
+This example is a little bit basic. However, I think it illustrate an important difference between `R-dplyr`/`Python-pandas`and `SQL`. The syntax in R/Python is largely consistent and linear, which makes it more human-readable. Whereas `SQL` is a bit more cumbersome. E.g. `WHERE` and `HAVING` subset on **records** and **summary of records** respectively when `dplyr` simply uses `filter`. 
 
 <!-- ```{sql, connection=con} -->
 <!-- SELECT f.carrier, AVG(f.dep_delay) AS mean_dep_delay -->

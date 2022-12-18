@@ -5,15 +5,15 @@ navbar:
   left:
     - text: "Basics"
       menu:
-        - text: Create, review, update, delete
-          href: https://kevinwang09.github.io/learnSQL/CRUD.html
         - text: Basic operations
           href: https://kevinwang09.github.io/learnSQL/basic.html
+        - text: Table - Create, review, update, delete
+          href: https://kevinwang09.github.io/learnSQL/CRUD.html
         - text: Join operations
           href: https://kevinwang09.github.io/learnSQL/join.html
     - text: "Intermediates"
       menu:
-        - text: Subqueries
+        - text: Subqueries - case when, with
           href: https://kevinwang09.github.io/learnSQL/subqueries.html
         - text: Window
           href: https://kevinwang09.github.io/learnSQL/window.html

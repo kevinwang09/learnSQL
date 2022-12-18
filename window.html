@@ -15,7 +15,6 @@
 
 <title>Window</title>
 
-<script src="site_libs/header-attrs-2.15/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/paper.min.css" rel="stylesheet" />
@@ -185,8 +184,8 @@ $(document).ready(function () {
   border-radius: 4px;
 }
 
-.tabset-dropdown > .nav-tabs > li.active:before {
-  content: "";
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
   font-family: 'Glyphicons Halflings';
   display: inline-block;
   padding: 10px;
@@ -194,16 +193,9 @@ $(document).ready(function () {
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-  content: "&#xe258;";
-  border: none;
-}
-
-.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-  content: "";
+  content: "\e258";
   font-family: 'Glyphicons Halflings';
-  display: inline-block;
-  padding: 10px;
-  border-right: 1px solid #ddd;
+  border: none;
 }
 
 .tabset-dropdown > .nav-tabs > li.active {
@@ -322,18 +314,10 @@ $(document).ready(function () {
 
 <div id="TOC">
 <ul>
-<li><a href="#data-preparation" id="toc-data-preparation">Data
-preparation</a></li>
-<li><a href="#adding-summary-statistics-over-the-entire-data-over"
-id="toc-adding-summary-statistics-over-the-entire-data-over">Adding
-summary statistics over the entire data (<code>OVER</code>)</a></li>
-<li><a
-href="#summary-statistics-partitioned-by-some-variables-partition-by"
-id="toc-summary-statistics-partitioned-by-some-variables-partition-by">Summary
-statistics partitioned by some variables
-(<code>PARTITION BY</code>)</a></li>
-<li><a href="#cumulative-sumaverage"
-id="toc-cumulative-sumaverage">Cumulative sum/average</a></li>
+<li><a href="#data-preparation">Data preparation</a></li>
+<li><a href="#adding-summary-statistics-over-the-entire-data-over">Adding summary statistics over the entire data (<code>OVER</code>)</a></li>
+<li><a href="#summary-statistics-partitioned-by-some-variables-partition-by">Summary statistics partitioned by some variables (<code>PARTITION BY</code>)</a></li>
+<li><a href="#cumulative-sumaverage">Cumulative sum/average</a></li>
 </ul>
 </div>
 
@@ -365,19 +349,10 @@ dbListTables(con)</code></pre>
 <pre><code>## [1] &quot;date&quot;      &quot;carrier&quot;   &quot;flight&quot;    &quot;arr_delay&quot; &quot;dep_delay&quot; &quot;origin&quot;   
 ## [7] &quot;dest&quot;</code></pre>
 </div>
-<div id="adding-summary-statistics-over-the-entire-data-over"
-class="section level1">
-<h1>Adding summary statistics over the entire data
-(<code>OVER</code>)</h1>
-<p>The OVER clause can essentially add columns to the output data. Used
-just by itself, without any partitioning, the summary statistic over the
-entire column will be created as a new column. This can be useful in the
-case that we want to perform some comparisons between the group-by level
-statistics and the overall statistics.</p>
-<p>In the following example, we calculate the average delay values by
-each carrier using the AVG and GROUP BY clauses. But we can also use the
-OVER clause to bypass the GROUP BY behaviour and create a column of mean
-delays across all flights.</p>
+<div id="adding-summary-statistics-over-the-entire-data-over" class="section level1">
+<h1>Adding summary statistics over the entire data (<code>OVER</code>)</h1>
+<p>The OVER clause can essentially add columns to the output data. Used just by itself, without any partitioning, the summary statistic over the entire column will be created as a new column. This can be useful in the case that we want to perform some comparisons between the group-by level statistics and the overall statistics.</p>
+<p>In the following example, we calculate the average delay values by each carrier using the AVG and GROUP BY clauses. But we can also use the OVER clause to bypass the GROUP BY behaviour and create a column of mean delays across all flights.</p>
 <pre class="sql"><code>SELECT carrier, 
        AVG(dep_delay) AS carrier_mean_delay,
        AVG(dep_delay) OVER() AS overall_mean_delay
@@ -448,18 +423,11 @@ GROUP BY carrier</code></pre>
 </table>
 </div>
 </div>
-<div id="summary-statistics-partitioned-by-some-variables-partition-by"
-class="section level1">
-<h1>Summary statistics partitioned by some variables
-(<code>PARTITION BY</code>)</h1>
-<p>The PARTITION BY option makes OVER more powerful: it can act like a
-subquery in the sense that summary statistics are grouped.</p>
-<p>For the query below, notice how the average delays are
-<strong>specific</strong> to the carrier and the origin.</p>
-<p><a
-href="https://www.sqlservercentral.com/articles/understanding-the-over-clause"
-class="uri">https://www.sqlservercentral.com/articles/understanding-the-over-clause</a>
-provides extra examples.</p>
+<div id="summary-statistics-partitioned-by-some-variables-partition-by" class="section level1">
+<h1>Summary statistics partitioned by some variables (<code>PARTITION BY</code>)</h1>
+<p>The PARTITION BY option makes OVER more powerful: it can act like a subquery in the sense that summary statistics are grouped.</p>
+<p>For the query below, notice how the average delays are <strong>specific</strong> to the carrier and the origin.</p>
+<p><a href="https://www.sqlservercentral.com/articles/understanding-the-over-clause" class="uri">https://www.sqlservercentral.com/articles/understanding-the-over-clause</a> provides extra examples.</p>
 <pre class="sql"><code>SELECT carrier, 
   origin,
   AVG(dep_delay) OVER(PARTITION BY carrier) AS carrier_delay,
@@ -521,12 +489,8 @@ GROUP BY carrier, origin</code></pre>
 </div>
 <div id="cumulative-sumaverage" class="section level1">
 <h1>Cumulative sum/average</h1>
-<p>This task is usually fairly straight forward in other languages, but
-in SQL, some specific keywords will be needed.</p>
-<p>The cumulative sum is specified as the average values from the
-current row and all the preceding rows of the data. The ordering of the
-rows is done by some other variable (in this example, the flight
-dates).</p>
+<p>This task is usually fairly straight forward in other languages, but in SQL, some specific keywords will be needed.</p>
+<p>The cumulative sum is specified as the average values from the current row and all the preceding rows of the data. The ordering of the rows is done by some other variable (in this example, the flight dates).</p>
 <pre class="sql"><code>SELECT carrier, 
   date,
   SUM(dep_delay) OVER(ORDER BY date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_total_delay

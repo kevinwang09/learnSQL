@@ -14,7 +14,6 @@
 
 <title>Learn SQL</title>
 
-<script src="site_libs/header-attrs-2.15/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/paper.min.css" rel="stylesheet" />
@@ -184,8 +183,8 @@ $(document).ready(function () {
   border-radius: 4px;
 }
 
-.tabset-dropdown > .nav-tabs > li.active:before {
-  content: "";
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
   font-family: 'Glyphicons Halflings';
   display: inline-block;
   padding: 10px;
@@ -193,16 +192,9 @@ $(document).ready(function () {
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-  content: "&#xe258;";
-  border: none;
-}
-
-.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-  content: "";
+  content: "\e258";
   font-family: 'Glyphicons Halflings';
-  display: inline-block;
-  padding: 10px;
-  border-right: 1px solid #ddd;
+  border: none;
 }
 
 .tabset-dropdown > .nav-tabs > li.active {
@@ -320,17 +312,13 @@ $(document).ready(function () {
 
 <div id="TOC">
 <ul>
-<li><a href="#why-i-am-making-this-site"
-id="toc-why-i-am-making-this-site">Why I am making this site?</a></li>
+<li><a href="#why-i-am-making-this-site">Why I am making this site?</a></li>
 </ul>
 </div>
 
 <div id="why-i-am-making-this-site" class="section level1">
 <h1>Why I am making this site?</h1>
-<p>I want this to be a personal repository of SQL codes that I write for
-my own future references. Unlike other online tutorials, I have taken
-some efforts to make sure this site is fully reproducible (with some
-basic R setups).</p>
+<p>I want this to be a personal repository of SQL codes that I write for my own future references. Unlike other online tutorials, I have taken some efforts to make sure this site is fully reproducible (with some basic R setups).</p>
 </div>
 
 

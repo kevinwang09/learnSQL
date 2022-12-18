@@ -15,7 +15,6 @@
 
 <title>Joining datasets</title>
 
-<script src="site_libs/header-attrs-2.15/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/paper.min.css" rel="stylesheet" />
@@ -185,8 +184,8 @@ $(document).ready(function () {
   border-radius: 4px;
 }
 
-.tabset-dropdown > .nav-tabs > li.active:before {
-  content: "";
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
   font-family: 'Glyphicons Halflings';
   display: inline-block;
   padding: 10px;
@@ -194,16 +193,9 @@ $(document).ready(function () {
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-  content: "&#xe258;";
-  border: none;
-}
-
-.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-  content: "";
+  content: "\e258";
   font-family: 'Glyphicons Halflings';
-  display: inline-block;
-  padding: 10px;
-  border-right: 1px solid #ddd;
+  border: none;
 }
 
 .tabset-dropdown > .nav-tabs > li.active {
@@ -322,20 +314,13 @@ $(document).ready(function () {
 
 <div id="TOC">
 <ul>
-<li><a href="#data-preparation" id="toc-data-preparation">Data
-preparation</a></li>
-<li><a href="#inner-join" id="toc-inner-join">Inner join</a></li>
-<li><a href="#as-aliasing-table-names"
-id="toc-as-aliasing-table-names">AS: Aliasing table names</a></li>
-<li><a href="#multiple-inner-joins"
-id="toc-multiple-inner-joins">Multiple inner joins</a></li>
-<li><a href="#renamingsubquery-during-join"
-id="toc-renamingsubquery-during-join">Renaming/subquery during
-join</a></li>
-<li><a href="#case-when" id="toc-case-when">Case when</a></li>
-<li><a href="#select-into-to-create-a-temporary-table"
-id="toc-select-into-to-create-a-temporary-table">SELECT INTO to create a
-temporary table</a></li>
+<li><a href="#data-preparation">Data preparation</a></li>
+<li><a href="#inner-join">Inner join</a></li>
+<li><a href="#as-aliasing-table-names">AS: Aliasing table names</a></li>
+<li><a href="#multiple-inner-joins">Multiple inner joins</a></li>
+<li><a href="#renamingsubquery-during-join">Renaming/subquery during join</a></li>
+<li><a href="#case-when">Case when</a></li>
+<li><a href="#select-into-to-create-a-temporary-table">SELECT INTO to create a temporary table</a></li>
 </ul>
 </div>
 
@@ -353,8 +338,7 @@ readr::write_csv(x = nycflights13::flights %&gt;%
                    dplyr::slice(1:100) %&gt;% 
                    dplyr::select(carrier, flight, tailnum, origin, dest), 
                  file = &quot;data/flights.csv&quot;)</code></pre>
-<p>This chunk of code will take the in-memory data and allow this data
-to be queried exactly like a SQL database.</p>
+<p>This chunk of code will take the in-memory data and allow this data to be queried exactly like a SQL database.</p>
 <pre class="r"><code>library(dplyr)
 library(DBI)
 # Create an ephemeral in-memory RSQLite database
@@ -375,13 +359,11 @@ dbListTables(con)</code></pre>
 <pre><code>## [1] &quot;carrier&quot; &quot;name&quot;</code></pre>
 <pre class="r"><code>dbListFields(con, &quot;flights&quot;)</code></pre>
 <pre><code>## [1] &quot;carrier&quot; &quot;flight&quot;  &quot;tailnum&quot; &quot;origin&quot;  &quot;dest&quot;</code></pre>
-<p>There are three data sets in this page: airports, airlines and
-flights.</p>
+<p>There are three data sets in this page: airports, airlines and flights.</p>
 </div>
 <div id="inner-join" class="section level1">
 <h1>Inner join</h1>
-<p><code>SQL</code> needs explicitly specify the common column by name
-on both data.</p>
+<p><code>SQL</code> needs explicitly specify the common column by name on both data.</p>
 <pre class="sql"><code>SELECT *
 FROM flights
 INNER JOIN airlines
@@ -389,15 +371,6 @@ INNER JOIN airlines
 <div class="knitsql-table">
 <table>
 <caption>Displaying records 1 - 10</caption>
-<colgroup>
-<col width="11%" />
-<col width="10%" />
-<col width="11%" />
-<col width="10%" />
-<col width="7%" />
-<col width="11%" />
-<col width="36%" />
-</colgroup>
 <thead>
 <tr class="header">
 <th align="left">carrier</th>
@@ -514,15 +487,6 @@ INNER JOIN airlines AS a
 <div class="knitsql-table">
 <table>
 <caption>Displaying records 1 - 10</caption>
-<colgroup>
-<col width="11%" />
-<col width="10%" />
-<col width="11%" />
-<col width="10%" />
-<col width="7%" />
-<col width="11%" />
-<col width="36%" />
-</colgroup>
 <thead>
 <tr class="header">
 <th align="left">carrier</th>
@@ -631,14 +595,8 @@ INNER JOIN airlines AS a
 </div>
 <div id="multiple-inner-joins" class="section level1">
 <h1>Multiple inner joins</h1>
-<p>One of the annoying thing is that <code>SQL</code> allows columns
-with the same name, so some manual renaming is necessary to avoid
-confusion in the final output. We will do this in the next section.</p>
-<p>In the following example, flight data is extracted. Each flight is
-then joined with the <code>airlines</code> table via the
-<code>carrier</code> column, and also joined with the
-<code>airports</code> table with the <code>origin</code> =
-<code>faa</code> specification.</p>
+<p>One of the annoying thing is that <code>SQL</code> allows columns with the same name, so some manual renaming is necessary to avoid confusion in the final output. We will do this in the next section.</p>
+<p>In the following example, flight data is extracted. Each flight is then joined with the <code>airlines</code> table via the <code>carrier</code> column, and also joined with the <code>airports</code> table with the <code>origin</code> = <code>faa</code> specification.</p>
 <pre class="sql"><code>SELECT *
 FROM flights
 INNER JOIN airlines
@@ -646,19 +604,8 @@ INNER JOIN airlines
 INNER JOIN airports
   ON flights.origin = airports.faa</code></pre>
 <div class="knitsql-table">
-<table style="width:100%;">
+<table>
 <caption>Displaying records 1 - 10</caption>
-<colgroup>
-<col width="8%" />
-<col width="7%" />
-<col width="8%" />
-<col width="7%" />
-<col width="5%" />
-<col width="8%" />
-<col width="27%" />
-<col width="4%" />
-<col width="21%" />
-</colgroup>
 <thead>
 <tr class="header">
 <th align="left">carrier</th>
@@ -789,10 +736,7 @@ INNER JOIN airports
 </div>
 <div id="renamingsubquery-during-join" class="section level1">
 <h1>Renaming/subquery during join</h1>
-<p>Sometimes, joining entire tables can be inefficient, especially if
-not all columns are needed. Thus, during the inner join call,
-<code>SELECT ... FROM</code> can be invoked within brackets and this
-subquery can also be aliased.</p>
+<p>Sometimes, joining entire tables can be inefficient, especially if not all columns are needed. Thus, during the inner join call, <code>SELECT ... FROM</code> can be invoked within brackets and this subquery can also be aliased.</p>
 <pre class="sql"><code>SELECT *
 FROM flights
 INNER JOIN (SELECT carrier, name AS carrier_name FROM airlines) AS rap
@@ -800,19 +744,8 @@ INNER JOIN (SELECT carrier, name AS carrier_name FROM airlines) AS rap
 INNER JOIN (SELECT faa, name AS airport_name FROM airports) AS ral
   ON flights.origin = ral.faa</code></pre>
 <div class="knitsql-table">
-<table style="width:100%;">
+<table>
 <caption>Displaying records 1 - 10</caption>
-<colgroup>
-<col width="8%" />
-<col width="7%" />
-<col width="8%" />
-<col width="7%" />
-<col width="5%" />
-<col width="8%" />
-<col width="27%" />
-<col width="4%" />
-<col width="21%" />
-</colgroup>
 <thead>
 <tr class="header">
 <th align="left">carrier</th>
@@ -943,8 +876,7 @@ INNER JOIN (SELECT faa, name AS airport_name FROM airports) AS ral
 </div>
 <div id="case-when" class="section level1">
 <h1>Case when</h1>
-<p>Case when allows for alternate coding for some categorical
-information.</p>
+<p>Case when allows for alternate coding for some categorical information.</p>
 <pre class="sql"><code>SELECT *, 
   CASE WHEN origin = &quot;JFK&quot; THEN 4
        WHEN origin = &quot;EWR&quot; THEN 3
@@ -1050,11 +982,9 @@ FROM flights;</code></pre>
 </table>
 </div>
 </div>
-<div id="select-into-to-create-a-temporary-table"
-class="section level1">
+<div id="select-into-to-create-a-temporary-table" class="section level1">
 <h1>SELECT INTO to create a temporary table</h1>
-<p>Unfortunately, the in-memory <code>RSQLite</code> set-up for this
-worksheet does not allow me to execute this SQL command.</p>
+<p>Unfortunately, the in-memory <code>RSQLite</code> set-up for this worksheet does not allow me to execute this SQL command.</p>
 <pre class="sql"><code>-- Creating frequency of carrier summary table
 SELECT carrier,
        COUNT(carrier) AS n

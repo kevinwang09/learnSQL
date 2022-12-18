@@ -15,7 +15,6 @@
 
 <title>Subqueries</title>
 
-<script src="site_libs/header-attrs-2.15/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/paper.min.css" rel="stylesheet" />
@@ -185,8 +184,8 @@ $(document).ready(function () {
   border-radius: 4px;
 }
 
-.tabset-dropdown > .nav-tabs > li.active:before {
-  content: "";
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
   font-family: 'Glyphicons Halflings';
   display: inline-block;
   padding: 10px;
@@ -194,16 +193,9 @@ $(document).ready(function () {
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-  content: "&#xe258;";
-  border: none;
-}
-
-.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-  content: "";
+  content: "\e258";
   font-family: 'Glyphicons Halflings';
-  display: inline-block;
-  padding: 10px;
-  border-right: 1px solid #ddd;
+  border: none;
 }
 
 .tabset-dropdown > .nav-tabs > li.active {
@@ -322,12 +314,9 @@ $(document).ready(function () {
 
 <div id="TOC">
 <ul>
-<li><a href="#data-preparation" id="toc-data-preparation">Data
-preparation</a></li>
-<li><a href="#case-when"
-id="toc-case-when"><code>CASE WHEN</code></a></li>
-<li><a href="#with-statement" id="toc-with-statement"><code>WITH</code>
-statement</a></li>
+<li><a href="#data-preparation">Data preparation</a></li>
+<li><a href="#case-when"><code>CASE WHEN</code></a></li>
+<li><a href="#with-statement"><code>WITH</code> statement</a></li>
 </ul>
 </div>
 
@@ -370,10 +359,8 @@ dbListTables(con)</code></pre>
 </div>
 <div id="case-when" class="section level1">
 <h1><code>CASE WHEN</code></h1>
-<p>This function is rather straight-forward. The syntax generally
-follows that: CASE WHEN logical THEN encoding ELSE encoding END.</p>
-<p>In general, it changes how variables are encoded and will allow us to
-perform aggregation.</p>
+<p>This function is rather straight-forward. The syntax generally follows that: CASE WHEN logical THEN encoding ELSE encoding END.</p>
+<p>In general, it changes how variables are encoded and will allow us to perform aggregation.</p>
 <pre class="sql"><code>SELECT dep_delay, arr_delay
 FROM flights as f</code></pre>
 <div class="knitsql-table">
@@ -513,15 +500,7 @@ FROM flights as f</code></pre>
 </div>
 <div id="with-statement" class="section level1">
 <h1><code>WITH</code> statement</h1>
-<p>This example is a little bit basic. However, I think it illustrate an
-important difference between
-<code>R-dplyr</code>/<code>Python-pandas</code>and <code>SQL</code>. The
-syntax in R/Python is largely consistent and linear, which makes it more
-human-readable. Whereas <code>SQL</code> is a bit more cumbersome. E.g.
-<code>WHERE</code> and <code>HAVING</code> subset on
-<strong>records</strong> and <strong>summary of records</strong>
-respectively when <code>dplyr</code> simply uses
-<code>filter</code>.</p>
+<p>This example is a little bit basic. However, I think it illustrate an important difference between <code>R-dplyr</code>/<code>Python-pandas</code>and <code>SQL</code>. The syntax in R/Python is largely consistent and linear, which makes it more human-readable. Whereas <code>SQL</code> is a bit more cumbersome. E.g. <code>WHERE</code> and <code>HAVING</code> subset on <strong>records</strong> and <strong>summary of records</strong> respectively when <code>dplyr</code> simply uses <code>filter</code>.</p>
 <!-- ```{sql, connection=con} -->
 <!-- SELECT f.carrier, AVG(f.dep_delay) AS mean_dep_delay -->
 <!-- FROM flights AS f -->

@@ -15,7 +15,6 @@
 
 <title>Create, review, update and delete</title>
 
-<script src="site_libs/header-attrs-2.15/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/paper.min.css" rel="stylesheet" />
@@ -185,8 +184,8 @@ $(document).ready(function () {
   border-radius: 4px;
 }
 
-.tabset-dropdown > .nav-tabs > li.active:before {
-  content: "";
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
   font-family: 'Glyphicons Halflings';
   display: inline-block;
   padding: 10px;
@@ -194,16 +193,9 @@ $(document).ready(function () {
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-  content: "&#xe258;";
-  border: none;
-}
-
-.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-  content: "";
+  content: "\e258";
   font-family: 'Glyphicons Halflings';
-  display: inline-block;
-  padding: 10px;
-  border-right: 1px solid #ddd;
+  border: none;
 }
 
 .tabset-dropdown > .nav-tabs > li.active {
@@ -322,28 +314,19 @@ $(document).ready(function () {
 
 <div id="TOC">
 <ul>
-<li><a href="#setting-up-connection-in-rsqlite"
-id="toc-setting-up-connection-in-rsqlite">Setting up connection (in
-<code>RSQLite</code>)</a></li>
-<li><a href="#creating-a-table" id="toc-creating-a-table">Creating a
-table</a></li>
-<li><a href="#inserting-rows" id="toc-inserting-rows">Inserting
-rows</a></li>
-<li><a href="#editing-rows" id="toc-editing-rows">Editing rows</a></li>
-<li><a href="#deleting-rows" id="toc-deleting-rows">Deleting
-rows</a></li>
-<li><a href="#adding-a-new-column" id="toc-adding-a-new-column">Adding a
-new column</a></li>
-<li><a href="#enforcing-uniqueness-in-the-columns"
-id="toc-enforcing-uniqueness-in-the-columns">Enforcing uniqueness in the
-columns</a></li>
+<li><a href="#setting-up-connection-in-rsqlite">Setting up connection (in <code>RSQLite</code>)</a></li>
+<li><a href="#creating-a-table">Creating a table</a></li>
+<li><a href="#inserting-rows">Inserting rows</a></li>
+<li><a href="#editing-rows">Editing rows</a></li>
+<li><a href="#deleting-rows">Deleting rows</a></li>
+<li><a href="#adding-a-new-column">Adding a new column</a></li>
+<li><a href="#enforcing-uniqueness-in-the-columns">Enforcing uniqueness in the columns</a></li>
 </ul>
 </div>
 
 <div id="setting-up-connection-in-rsqlite" class="section level1">
 <h1>Setting up connection (in <code>RSQLite</code>)</h1>
-<p>This chunk of code will take the in-memory data and allow this data
-to be queried exactly like a SQL database.</p>
+<p>This chunk of code will take the in-memory data and allow this data to be queried exactly like a SQL database.</p>
 <pre class="r"><code>library(dplyr)
 library(DBI)
 library(tidyverse)
@@ -535,8 +518,7 @@ FROM tbl</code></pre>
 </tbody>
 </table>
 </div>
-<p><code>UPDATE...SET...</code> allows one to set values for the
-columns.</p>
+<p><code>UPDATE...SET...</code> allows one to set values for the columns.</p>
 <pre class="sql"><code>UPDATE tbl 
 SET n2 = numbers;</code></pre>
 <pre class="sql"><code>SELECT *
@@ -598,8 +580,7 @@ FROM tbl</code></pre>
 </div>
 <div id="enforcing-uniqueness-in-the-columns" class="section level1">
 <h1>Enforcing uniqueness in the columns</h1>
-<p>This is most common when we have an ID column where duplicates are
-not allowed.</p>
+<p>This is most common when we have an ID column where duplicates are not allowed.</p>
 <pre class="sql"><code>CREATE TABLE uniquetbl (
   ID INT NOT NULL UNIQUE, 
   letters VARCHAR(10)

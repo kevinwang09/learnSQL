@@ -43,6 +43,143 @@ dbListFields(con, "airlines")
 dbListFields(con, "flights")
 ```
 
+# Subqueries
+
+SQL queries can be nested. The subquery can be any part of `SELECT`, `FROM`, `WHERE` and `GROUP BY`.
+
+The main ways that you can use a subquery: 
+
+1. Comparing groups to summarised values
+2. Reshaping data
+3. Combine data that cannot be joined
+
+## Subquery in `WHERE`
+
+In the following example, we first check for the average departure delays in the `flights` data, across all carriers. 
+
+```{sql, connection=con}
+SELECT AVG(dep_delay) FROM flights
+```
+We can then use this average value to filter for flights that are greater than the average departure delays. 
+
+```{sql, connection=con}
+SELECT carrier, dep_delay
+FROM flights
+WHERE dep_delay > (SELECT AVG(dep_delay) FROM flights)
+```
+
+We can further summarise the average delays by carrier, restricting to only the 33 records above. 
+
+```{sql, connection=con}
+SELECT carrier, AVG(dep_delay) AS carrier_avg_dep_delay
+FROM flights
+WHERE dep_delay > (SELECT AVG(dep_delay) FROM flights)
+GROUP BY carrier
+```
+
+Note that, the `WHERE` clause has a higher order of operation than `SELECT.`. Thus, the result we generate is the carrier-specific results of the 33 records, and NOT the result restricted to only carriers that are greater than the average. To illustrate this, pay attention to the query below. We see that AA has an average departure delay of -0.58, which is less than the overall average of -0.23. But in the query above shows a result of 5.6 for AA. This is because the WHERE clause is executed first before SELECT.
+
+```{sql, connection=con}
+SELECT carrier, AVG(dep_delay) AS carrier_avg_dep_delay
+FROM flights
+GROUP BY carrier
+```
+
+Here is the general order of operations in an SQL query:
+
+1. FROM clause: This clause specifies the tables that the query will operate on.
+1. WHERE clause: This clause specifies the conditions that must be met for a row to be included in the query results.
+1. GROUP BY clause: This clause groups the rows of the query result into sets based on the values of one or more columns.
+1. HAVING clause: This clause filters the grouped rows based on a specified condition.
+1. SELECT clause: This clause specifies the columns that will be included in the query results.
+1. ORDER BY clause: This clause specifies the order in which the rows of the query result will be sorted.
+
+## Subquery in the `FROM` statement
+
+<!-- This is a case where we can transform the data from long to wide format before selecting. -->
+
+Note that this code will return an error, because that the `WHERE` clause can not operate on a variable that is being created in the `SELECT` clause. Again, because that the `SELECT` clause has a lower order of operation than `WHERE`, this is why `WHERE` cannot operate on a variable that has not been created yet. 
+
+```{sql, connection=con, error=TRUE}
+SELECT carrier, AVG(dep_delay) AS avg_dep_delay
+FROM flights as f
+WHERE avg_dep_delay > 0
+GROUP BY carrier
+```
+
+This problem can be solved by the `HAVING` clause as below. 
+
+```{sql, connection=con, error=TRUE}
+SELECT carrier, AVG(dep_delay) AS avg_dep_delay
+FROM flights as f
+GROUP BY carrier
+HAVING avg_dep_delay > 0
+```
+
+However, we can also turn the query as a subquery and then perform additional operations on it. 
+
+```{sql, connection=con}
+SELECT carrier, avg_dep_delay
+FROM (
+  SELECT carrier, AVG(dep_delay) AS avg_dep_delay
+  FROM flights as f
+  GROUP BY carrier)
+WHERE avg_dep_delay > 0
+```
+
+## Subquery inside the `SELECT` clause
+
+Here, we need to return a single value to compare against individual values. 
+
+```{sql, connection=con}
+SELECT carrier, COUNT(carrier) AS num_flights
+FROM flights
+GROUP BY carrier
+```
+
+
+# Improve readability using the `WITH` statement
+
+<!-- ```{sql, connection=con} -->
+<!-- SELECT f.carrier, AVG(f.dep_delay) AS mean_dep_delay -->
+<!-- FROM flights AS f -->
+<!-- INNER JOIN airlines AS a -->
+<!--   ON f.carrier = a.carrier -->
+<!-- GROUP BY f.carrier -->
+<!-- ``` -->
+
+In the example below, a full SQL query summarising the departure delay as a table, `t`. Another operation is performed on this summarised table to extract the maximum average departure delay carrier.
+
+```{sql, connection=con}
+WITH t as (SELECT f.carrier, a.name, AVG(f.dep_delay) AS mean_dep_delay
+      FROM flights AS f
+      INNER JOIN airlines AS a
+        ON f.carrier = a.carrier
+      GROUP BY f.carrier)
+SELECT *
+FROM t
+WHERE t.mean_dep_delay = (SELECT MAX(t.mean_dep_delay) FROM t);
+```
+## `WITH` can be used on multiple tables 
+
+The only thing needed here is to use a comma to separate the different tables. 
+
+```{sql, connection=con}
+WITH 
+  nyc_airports AS 
+    (SELECT faa, name
+     FROM airports
+     WHERE faa IN ("LGA", "JFK", "EWR")),
+  other_airports AS 
+    (SELECT * FROM airports)
+SELECT carrier, origin, dest, nyc_airports.name AS origin_name, other_airports.name AS dest_name
+FROM flights
+INNER JOIN nyc_airports
+ON flights.origin = nyc_airports.faa
+INNER JOIN other_airports
+ON flights.dest = other_airports.faa
+```
+
 # `CASE WHEN`
 
 This function is rather straight-forward. The syntax generally follows that: CASE WHEN logical THEN encoding ELSE encoding END.
@@ -74,26 +211,45 @@ SELECT
 FROM flights as f
 ```
 
-# `WITH` statement
 
-This example is a little bit basic. However, I think it illustrate an important difference between `R-dplyr`/`Python-pandas`and `SQL`. The syntax in R/Python is largely consistent and linear, which makes it more human-readable. Whereas `SQL` is a bit more cumbersome. E.g. `WHERE` and `HAVING` subset on **records** and **summary of records** respectively when `dplyr` simply uses `filter`. 
+# Correlated subqueries 
 
-<!-- ```{sql, connection=con} -->
-<!-- SELECT f.carrier, AVG(f.dep_delay) AS mean_dep_delay -->
-<!-- FROM flights AS f -->
-<!-- INNER JOIN airlines AS a -->
-<!--   ON f.carrier = a.carrier -->
-<!-- GROUP BY f.carrier -->
-<!-- ``` -->
+Correlated subqueries are subqueries that reference one or more columns in the main query. Correlated subqueries depend on information in the main query to run, and thus, cannot be executed on their own.
+
+Correlated subqueries are evaluated in SQL once per row of data retrieved, a process that takes a lot more computing power and time than a simple subquery.
+
+In the example below, the subquery in the WHERE clause will first calculate the average arrival delay for each carrier. This information is computed carrier by carrier and only the flights with with the arrival delay less than that carrier's average are returned for the main query.  
 
 ```{sql, connection=con}
-WITH t as (SELECT f.carrier, a.name, AVG(f.dep_delay) AS mean_dep_delay
-      FROM flights AS f
-      INNER JOIN airlines AS a
-        ON f.carrier = a.carrier
-      GROUP BY f.carrier)
-      
-SELECT *
-FROM t
-WHERE t.mean_dep_delay = (SELECT MAX(t.mean_dep_delay) FROM t);
+SELECT 
+  main.carrier, 
+  main.arr_delay
+FROM flights as main
+WHERE 
+  main.arr_delay < 
+  (
+    SELECT AVG(sub.arr_delay)
+    FROM flights as sub
+    WHERE main.carrier = sub.carrier
+  )
+```
+
+This information is, in theory, identical to this query, which is more spread out and explicit in how the JOIN operation is used. 
+
+Using a join instead of a subquery can be more efficient because the database engine can optimize the join operation and potentially use indexes on the carrier column. In contrast, a subquery may require the database engine to perform a separate query for each row in the main table, which can be slow for large datasets.
+
+```{sql, connection=con}
+SELECT 
+  main.carrier, 
+  main.arr_delay
+FROM flights as main
+JOIN 
+  (
+    SELECT carrier, AVG(arr_delay) as avg_delay
+    FROM flights
+    GROUP BY carrier
+  ) as sub
+ON 
+  main.carrier = sub.carrier
+  AND main.arr_delay < sub.avg_delay
 ```

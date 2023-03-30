@@ -323,25 +323,30 @@ $(document).ready(function () {
 <div id="TOC">
 <ul>
 <li><a href="#setting-up-connection-in-rsqlite"
-id="toc-setting-up-connection-in-rsqlite">Setting up connection (in
+id="toc-setting-up-connection-in-rsqlite"><span
+class="toc-section-number">1</span> Setting up connection (in
 <code>RSQLite</code>)</a></li>
-<li><a href="#creating-a-table" id="toc-creating-a-table">Creating a
-table</a></li>
-<li><a href="#inserting-rows" id="toc-inserting-rows">Inserting
-rows</a></li>
-<li><a href="#editing-rows" id="toc-editing-rows">Editing rows</a></li>
-<li><a href="#deleting-rows" id="toc-deleting-rows">Deleting
-rows</a></li>
-<li><a href="#adding-a-new-column" id="toc-adding-a-new-column">Adding a
-new column</a></li>
+<li><a href="#creating-a-table" id="toc-creating-a-table"><span
+class="toc-section-number">2</span> Creating a table</a></li>
+<li><a href="#inserting-rows" id="toc-inserting-rows"><span
+class="toc-section-number">3</span> Inserting rows</a></li>
+<li><a href="#editing-rows" id="toc-editing-rows"><span
+class="toc-section-number">4</span> Editing rows</a></li>
+<li><a href="#deleting-rows" id="toc-deleting-rows"><span
+class="toc-section-number">5</span> Deleting rows</a></li>
+<li><a href="#adding-a-new-column" id="toc-adding-a-new-column"><span
+class="toc-section-number">6</span> Adding a new column</a></li>
 <li><a href="#enforcing-uniqueness-in-the-columns"
-id="toc-enforcing-uniqueness-in-the-columns">Enforcing uniqueness in the
+id="toc-enforcing-uniqueness-in-the-columns"><span
+class="toc-section-number">7</span> Enforcing uniqueness in the
 columns</a></li>
 </ul>
 </div>
 
-<div id="setting-up-connection-in-rsqlite" class="section level1">
-<h1>Setting up connection (in <code>RSQLite</code>)</h1>
+<div id="setting-up-connection-in-rsqlite" class="section level1"
+number="1">
+<h1><span class="header-section-number">1</span> Setting up connection
+(in <code>RSQLite</code>)</h1>
 <p>This chunk of code will take the in-memory data and allow this data
 to be queried exactly like a SQL database.</p>
 <pre class="r"><code>library(dplyr)
@@ -358,8 +363,8 @@ dbListTables(con)</code></pre>
 # dbListTables(con)
 # dbListFields(con, &quot;tbl&quot;)</code></pre>
 </div>
-<div id="creating-a-table" class="section level1">
-<h1>Creating a table</h1>
+<div id="creating-a-table" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Creating a table</h1>
 <pre class="sql"><code>/*Creating a table called tbl, with the columns numbers and letters*/
 
 CREATE TABLE tbl (
@@ -400,8 +405,8 @@ FROM tbl;</code></pre>
 </table>
 </div>
 </div>
-<div id="inserting-rows" class="section level1">
-<h1>Inserting rows</h1>
+<div id="inserting-rows" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Inserting rows</h1>
 <pre class="sql"><code>INSERT INTO tbl
  (numbers, letters)
 VALUES
@@ -438,8 +443,8 @@ FROM tbl;</code></pre>
 </table>
 </div>
 </div>
-<div id="editing-rows" class="section level1">
-<h1>Editing rows</h1>
+<div id="editing-rows" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Editing rows</h1>
 <pre class="sql"><code>UPDATE tbl
 SET 
   letters = &#39;Unknown&#39;
@@ -477,8 +482,8 @@ FROM tbl;</code></pre>
 </table>
 </div>
 </div>
-<div id="deleting-rows" class="section level1">
-<h1>Deleting rows</h1>
+<div id="deleting-rows" class="section level1" number="5">
+<h1><span class="header-section-number">5</span> Deleting rows</h1>
 <pre class="sql"><code>DELETE FROM tbl WHERE letters = &#39;Unknown&#39;</code></pre>
 <pre class="sql"><code>SELECT *
 FROM tbl;</code></pre>
@@ -504,8 +509,9 @@ FROM tbl;</code></pre>
 </table>
 </div>
 </div>
-<div id="adding-a-new-column" class="section level1">
-<h1>Adding a new column</h1>
+<div id="adding-a-new-column" class="section level1" number="6">
+<h1><span class="header-section-number">6</span> Adding a new
+column</h1>
 <p>This initiates a new column.</p>
 <pre class="sql"><code>ALTER TABLE tbl
   ADD n2 DECIMAL (10, 2);</code></pre>
@@ -596,8 +602,10 @@ FROM tbl</code></pre>
 </table>
 </div>
 </div>
-<div id="enforcing-uniqueness-in-the-columns" class="section level1">
-<h1>Enforcing uniqueness in the columns</h1>
+<div id="enforcing-uniqueness-in-the-columns" class="section level1"
+number="7">
+<h1><span class="header-section-number">7</span> Enforcing uniqueness in
+the columns</h1>
 <p>This is most common when we have an ID column where duplicates are
 not allowed.</p>
 <pre class="sql"><code>CREATE TABLE uniquetbl (

@@ -322,65 +322,80 @@ $(document).ready(function () {
 
 <div id="TOC">
 <ul>
-<li><a href="#data-preparation-in-r" id="toc-data-preparation-in-r">Data
-preparation in <code>R</code></a></li>
+<li><a href="#data-preparation-in-r"
+id="toc-data-preparation-in-r"><span class="toc-section-number">1</span>
+Data preparation in <code>R</code></a></li>
 <li><a href="#setting-up-connection-in-rsqlite"
-id="toc-setting-up-connection-in-rsqlite">Setting up connection (in
+id="toc-setting-up-connection-in-rsqlite"><span
+class="toc-section-number">2</span> Setting up connection (in
 <code>RSQlite</code>)</a></li>
 <li><a href="#selecting-specific-columns"
-id="toc-selecting-specific-columns">Selecting specific columns</a>
+id="toc-selecting-specific-columns"><span
+class="toc-section-number">3</span> Selecting specific columns</a>
 <ul>
-<li><a href="#select-all-columns" id="toc-select-all-columns">Select all
-columns</a></li>
+<li><a href="#select-all-columns" id="toc-select-all-columns"><span
+class="toc-section-number">3.1</span> Select all columns</a></li>
 <li><a href="#selecting-distinct-entries-from"
-id="toc-selecting-distinct-entries-from">Selecting distinct entries
+id="toc-selecting-distinct-entries-from"><span
+class="toc-section-number">3.2</span> Selecting distinct entries
 from</a></li>
 </ul></li>
 <li><a href="#counting-number-of-distinct-entries"
-id="toc-counting-number-of-distinct-entries">Counting number of distinct
+id="toc-counting-number-of-distinct-entries"><span
+class="toc-section-number">4</span> Counting number of distinct
 entries</a></li>
-<li><a href="#sorting" id="toc-sorting">Sorting</a></li>
-<li><a href="#limited-rows" id="toc-limited-rows">Limited rows</a>
+<li><a href="#sorting" id="toc-sorting"><span
+class="toc-section-number">5</span> Sorting</a></li>
+<li><a href="#limited-rows" id="toc-limited-rows"><span
+class="toc-section-number">6</span> Limited rows</a>
 <ul>
 <li><a href="#filtering-for-the-first-few-rows"
-id="toc-filtering-for-the-first-few-rows">Filtering for the first few
+id="toc-filtering-for-the-first-few-rows"><span
+class="toc-section-number">6.1</span> Filtering for the first few
 rows</a></li>
 <li><a href="#filtering-for-the-first-few-rows-ordered-by-some-variable"
-id="toc-filtering-for-the-first-few-rows-ordered-by-some-variable">Filtering
-for the first few rows ordered by some variable</a></li>
+id="toc-filtering-for-the-first-few-rows-ordered-by-some-variable"><span
+class="toc-section-number">6.2</span> Filtering for the first few rows
+ordered by some variable</a></li>
 </ul></li>
-<li><a href="#filtering" id="toc-filtering">Filtering</a>
+<li><a href="#filtering" id="toc-filtering"><span
+class="toc-section-number">7</span> Filtering</a>
 <ul>
-<li><a href="#filtering-for-rows" id="toc-filtering-for-rows">Filtering
-for rows</a></li>
-<li><a href="#numeric-columns" id="toc-numeric-columns">Numeric
-columns</a></li>
-<li><a href="#categorical-columns"
-id="toc-categorical-columns">Categorical columns</a></li>
+<li><a href="#filtering-for-rows" id="toc-filtering-for-rows"><span
+class="toc-section-number">7.1</span> Filtering for rows</a></li>
+<li><a href="#numeric-columns" id="toc-numeric-columns"><span
+class="toc-section-number">7.2</span> Numeric columns</a></li>
+<li><a href="#categorical-columns" id="toc-categorical-columns"><span
+class="toc-section-number">7.3</span> Categorical columns</a></li>
 </ul></li>
-<li><a href="#missing-values" id="toc-missing-values">Missing
-values</a></li>
-<li><a href="#string-operations" id="toc-string-operations">String
-operations</a></li>
-<li><a href="#summarisation"
-id="toc-summarisation">Summarisation</a></li>
+<li><a href="#missing-values" id="toc-missing-values"><span
+class="toc-section-number">8</span> Missing values</a></li>
+<li><a href="#string-operations" id="toc-string-operations"><span
+class="toc-section-number">9</span> String operations</a></li>
+<li><a href="#summarisation" id="toc-summarisation"><span
+class="toc-section-number">10</span> Summarisation</a></li>
 <li><a href="#proportion-calculation"
-id="toc-proportion-calculation">Proportion calculation</a></li>
+id="toc-proportion-calculation"><span
+class="toc-section-number">11</span> Proportion calculation</a></li>
 <li><a href="#filtering-using-summary-statistics"
-id="toc-filtering-using-summary-statistics">Filtering using summary
+id="toc-filtering-using-summary-statistics"><span
+class="toc-section-number">12</span> Filtering using summary
 statistics</a></li>
 </ul>
 </div>
 
-<div id="data-preparation-in-r" class="section level1">
-<h1>Data preparation in <code>R</code></h1>
+<div id="data-preparation-in-r" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Data preparation in
+<code>R</code></h1>
 <p>Evaluated only once to create a CSV file.</p>
 <pre class="r"><code>library(palmerpenguins)
 library(tidyverse)
 readr::write_csv(x = penguins, file = &quot;data/penguins.csv&quot;)</code></pre>
 </div>
-<div id="setting-up-connection-in-rsqlite" class="section level1">
-<h1>Setting up connection (in <code>RSQlite</code>)</h1>
+<div id="setting-up-connection-in-rsqlite" class="section level1"
+number="2">
+<h1><span class="header-section-number">2</span> Setting up connection
+(in <code>RSQlite</code>)</h1>
 <p>This chunk of code will take the in-memory data and allow this data
 to be queried exactly like a SQL database.</p>
 <p>The print methods for <code>R</code> is different to that of
@@ -400,8 +415,9 @@ dbListTables(con)</code></pre>
 ## [4] &quot;bill_depth_mm&quot;     &quot;flipper_length_mm&quot; &quot;body_mass_g&quot;      
 ## [7] &quot;sex&quot;               &quot;year&quot;</code></pre>
 </div>
-<div id="selecting-specific-columns" class="section level1">
-<h1>Selecting specific columns</h1>
+<div id="selecting-specific-columns" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Selecting specific
+columns</h1>
 <pre class="sql"><code>SELECT species, island 
 FROM penguins</code></pre>
 <div class="knitsql-table">
@@ -457,8 +473,9 @@ FROM penguins</code></pre>
 </tbody>
 </table>
 </div>
-<div id="select-all-columns" class="section level2">
-<h2>Select all columns</h2>
+<div id="select-all-columns" class="section level2" number="3.1">
+<h2><span class="header-section-number">3.1</span> Select all
+columns</h2>
 <pre class="sql"><code>SELECT * 
 FROM penguins;</code></pre>
 <div class="knitsql-table">
@@ -591,8 +608,10 @@ FROM penguins;</code></pre>
 </table>
 </div>
 </div>
-<div id="selecting-distinct-entries-from" class="section level2">
-<h2>Selecting distinct entries from</h2>
+<div id="selecting-distinct-entries-from" class="section level2"
+number="3.2">
+<h2><span class="header-section-number">3.2</span> Selecting distinct
+entries from</h2>
 <pre class="sql"><code>SELECT DISTINCT species 
 FROM penguins;</code></pre>
 <div class="knitsql-table">
@@ -653,8 +672,10 @@ FROM penguins;</code></pre>
 </div>
 </div>
 </div>
-<div id="counting-number-of-distinct-entries" class="section level1">
-<h1>Counting number of distinct entries</h1>
+<div id="counting-number-of-distinct-entries" class="section level1"
+number="4">
+<h1><span class="header-section-number">4</span> Counting number of
+distinct entries</h1>
 <pre class="sql"><code>SELECT species, 
        COUNT(species) AS n
 FROM penguins
@@ -685,8 +706,8 @@ GROUP BY species;</code></pre>
 </table>
 </div>
 </div>
-<div id="sorting" class="section level1">
-<h1>Sorting</h1>
+<div id="sorting" class="section level1" number="5">
+<h1><span class="header-section-number">5</span> Sorting</h1>
 <pre class="sql"><code>SELECT species, 
        COUNT(*)*1.0/(SELECT COUNT(*) AS total FROM penguins) AS proportion
 FROM penguins
@@ -718,10 +739,12 @@ ORDER BY proportion DESC</code></pre>
 </table>
 </div>
 </div>
-<div id="limited-rows" class="section level1">
-<h1>Limited rows</h1>
-<div id="filtering-for-the-first-few-rows" class="section level2">
-<h2>Filtering for the first few rows</h2>
+<div id="limited-rows" class="section level1" number="6">
+<h1><span class="header-section-number">6</span> Limited rows</h1>
+<div id="filtering-for-the-first-few-rows" class="section level2"
+number="6.1">
+<h2><span class="header-section-number">6.1</span> Filtering for the
+first few rows</h2>
 <pre class="sql"><code>SELECT *
 FROM penguins
 LIMIT 10</code></pre>
@@ -856,8 +879,9 @@ LIMIT 10</code></pre>
 </div>
 </div>
 <div id="filtering-for-the-first-few-rows-ordered-by-some-variable"
-class="section level2">
-<h2>Filtering for the first few rows ordered by some variable</h2>
+class="section level2" number="6.2">
+<h2><span class="header-section-number">6.2</span> Filtering for the
+first few rows ordered by some variable</h2>
 <pre class="sql"><code>SELECT * 
 FROM penguins
 ORDER BY body_mass_g DESC
@@ -993,15 +1017,16 @@ LIMIT 10</code></pre>
 </div>
 </div>
 </div>
-<div id="filtering" class="section level1">
-<h1>Filtering</h1>
-<div id="filtering-for-rows" class="section level2">
-<h2>Filtering for rows</h2>
+<div id="filtering" class="section level1" number="7">
+<h1><span class="header-section-number">7</span> Filtering</h1>
+<div id="filtering-for-rows" class="section level2" number="7.1">
+<h2><span class="header-section-number">7.1</span> Filtering for
+rows</h2>
 <p><code>WHERE</code> is the keyword for handling both numeric and
 character columns. It should evaluate to some boolean value.</p>
 </div>
-<div id="numeric-columns" class="section level2">
-<h2>Numeric columns</h2>
+<div id="numeric-columns" class="section level2" number="7.2">
+<h2><span class="header-section-number">7.2</span> Numeric columns</h2>
 <pre class="sql"><code>SELECT species, 
        COUNT(species) AS n
 FROM penguins
@@ -1065,8 +1090,9 @@ GROUP BY species</code></pre>
 </table>
 </div>
 </div>
-<div id="categorical-columns" class="section level2">
-<h2>Categorical columns</h2>
+<div id="categorical-columns" class="section level2" number="7.3">
+<h2><span class="header-section-number">7.3</span> Categorical
+columns</h2>
 <p>The major difference is that R/Python compared to SQL is that the
 former use double equal sign <code>==</code> whereas <code>SQL</code>
 uses a single equal sign <code>=</code> when subsetting categorical
@@ -1129,8 +1155,8 @@ GROUP BY species</code></pre>
 </div>
 </div>
 </div>
-<div id="missing-values" class="section level1">
-<h1>Missing values</h1>
+<div id="missing-values" class="section level1" number="8">
+<h1><span class="header-section-number">8</span> Missing values</h1>
 <p><code>R</code> uses <code>NA</code> to encode missing values.</p>
 <p><code>SQL</code> uses <code>NULL</code> to encode missing values,
 which is not to be confused with <code>NULL</code> in <code>R</code> or
@@ -1192,8 +1218,8 @@ GROUP BY species</code></pre>
 </table>
 </div>
 </div>
-<div id="string-operations" class="section level1">
-<h1>String operations</h1>
+<div id="string-operations" class="section level1" number="9">
+<h1><span class="header-section-number">9</span> String operations</h1>
 <p>The first task aims to tally the species of penguins, for entries
 with island begin with the characters “Torg”.</p>
 <pre class="sql"><code>SELECT species, 
@@ -1247,8 +1273,8 @@ GROUP BY species</code></pre>
 </table>
 </div>
 </div>
-<div id="summarisation" class="section level1">
-<h1>Summarisation</h1>
+<div id="summarisation" class="section level1" number="10">
+<h1><span class="header-section-number">10</span> Summarisation</h1>
 <pre class="sql"><code>SELECT species, 
        MIN(body_mass_g) AS min_mass,
        AVG(body_mass_g) AS mean_mass,
@@ -1299,8 +1325,9 @@ GROUP BY species</code></pre>
 </table>
 </div>
 </div>
-<div id="proportion-calculation" class="section level1">
-<h1>Proportion calculation</h1>
+<div id="proportion-calculation" class="section level1" number="11">
+<h1><span class="header-section-number">11</span> Proportion
+calculation</h1>
 <p>In the code below, we are calculating the frequencies of penguins and
 the percentages. Notice that this percentage is calculated with respect
 to the entire penguin population, i.e. the total is needed.</p>
@@ -1370,8 +1397,10 @@ ORDER BY proportion DESC</code></pre>
 </table>
 </div>
 </div>
-<div id="filtering-using-summary-statistics" class="section level1">
-<h1>Filtering using summary statistics</h1>
+<div id="filtering-using-summary-statistics" class="section level1"
+number="12">
+<h1><span class="header-section-number">12</span> Filtering using
+summary statistics</h1>
 <p>In <code>SQL</code>, the <code>WHERE</code> function cannot operate
 on summary statistics, this is a job for <code>HAVING</code>.</p>
 <p>In the task below, we will group by the species and sex of the

@@ -322,25 +322,30 @@ $(document).ready(function () {
 
 <div id="TOC">
 <ul>
-<li><a href="#data-preparation" id="toc-data-preparation">Data
-preparation</a></li>
-<li><a href="#inner-join" id="toc-inner-join">Inner join</a></li>
+<li><a href="#data-preparation" id="toc-data-preparation"><span
+class="toc-section-number">1</span> Data preparation</a></li>
+<li><a href="#inner-join" id="toc-inner-join"><span
+class="toc-section-number">2</span> Inner join</a></li>
 <li><a href="#as-aliasing-table-names"
-id="toc-as-aliasing-table-names">AS: Aliasing table names</a></li>
-<li><a href="#multiple-inner-joins"
-id="toc-multiple-inner-joins">Multiple inner joins</a></li>
+id="toc-as-aliasing-table-names"><span
+class="toc-section-number">3</span> AS: Aliasing table names</a></li>
+<li><a href="#multiple-inner-joins" id="toc-multiple-inner-joins"><span
+class="toc-section-number">4</span> Multiple inner joins</a></li>
 <li><a href="#renamingsubquery-during-join"
-id="toc-renamingsubquery-during-join">Renaming/subquery during
+id="toc-renamingsubquery-during-join"><span
+class="toc-section-number">5</span> Renaming/subquery during
 join</a></li>
-<li><a href="#case-when" id="toc-case-when">Case when</a></li>
+<li><a href="#case-when" id="toc-case-when"><span
+class="toc-section-number">6</span> Case when</a></li>
 <li><a href="#select-into-to-create-a-temporary-table"
-id="toc-select-into-to-create-a-temporary-table">SELECT INTO to create a
-temporary table</a></li>
+id="toc-select-into-to-create-a-temporary-table"><span
+class="toc-section-number">7</span> SELECT INTO to create a temporary
+table</a></li>
 </ul>
 </div>
 
-<div id="data-preparation" class="section level1">
-<h1>Data preparation</h1>
+<div id="data-preparation" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Data preparation</h1>
 <p>Evaluated only once to create a CSV file.</p>
 <pre class="r"><code>library(nycflights13)
 library(tidyverse)
@@ -378,8 +383,8 @@ dbListTables(con)</code></pre>
 <p>There are three data sets in this page: airports, airlines and
 flights.</p>
 </div>
-<div id="inner-join" class="section level1">
-<h1>Inner join</h1>
+<div id="inner-join" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Inner join</h1>
 <p><code>SQL</code> needs explicitly specify the common column by name
 on both data.</p>
 <pre class="sql"><code>SELECT *
@@ -504,8 +509,9 @@ INNER JOIN airlines
 </table>
 </div>
 </div>
-<div id="as-aliasing-table-names" class="section level1">
-<h1>AS: Aliasing table names</h1>
+<div id="as-aliasing-table-names" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> AS: Aliasing table
+names</h1>
 <p>We can freely rename the naming of variables in <code>R</code>.</p>
 <pre class="sql"><code>SELECT *
 FROM flights AS f
@@ -629,8 +635,9 @@ INNER JOIN airlines AS a
 </table>
 </div>
 </div>
-<div id="multiple-inner-joins" class="section level1">
-<h1>Multiple inner joins</h1>
+<div id="multiple-inner-joins" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Multiple inner
+joins</h1>
 <p>One of the annoying thing is that <code>SQL</code> allows columns
 with the same name, so some manual renaming is necessary to avoid
 confusion in the final output. We will do this in the next section.</p>
@@ -787,8 +794,10 @@ INNER JOIN airports
 </table>
 </div>
 </div>
-<div id="renamingsubquery-during-join" class="section level1">
-<h1>Renaming/subquery during join</h1>
+<div id="renamingsubquery-during-join" class="section level1"
+number="5">
+<h1><span class="header-section-number">5</span> Renaming/subquery
+during join</h1>
 <p>Sometimes, joining entire tables can be inefficient, especially if
 not all columns are needed. Thus, during the inner join call,
 <code>SELECT ... FROM</code> can be invoked within brackets and this
@@ -941,8 +950,8 @@ INNER JOIN (SELECT faa, name AS airport_name FROM airports) AS ral
 </table>
 </div>
 </div>
-<div id="case-when" class="section level1">
-<h1>Case when</h1>
+<div id="case-when" class="section level1" number="6">
+<h1><span class="header-section-number">6</span> Case when</h1>
 <p>Case when allows for alternate coding for some categorical
 information.</p>
 <pre class="sql"><code>SELECT *, 
@@ -1050,9 +1059,10 @@ FROM flights;</code></pre>
 </table>
 </div>
 </div>
-<div id="select-into-to-create-a-temporary-table"
-class="section level1">
-<h1>SELECT INTO to create a temporary table</h1>
+<div id="select-into-to-create-a-temporary-table" class="section level1"
+number="7">
+<h1><span class="header-section-number">7</span> SELECT INTO to create a
+temporary table</h1>
 <p>Unfortunately, the in-memory <code>RSQLite</code> set-up for this
 worksheet does not allow me to execute this SQL command.</p>
 <pre class="sql"><code>-- Creating frequency of carrier summary table

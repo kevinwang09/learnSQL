@@ -322,23 +322,25 @@ $(document).ready(function () {
 
 <div id="TOC">
 <ul>
-<li><a href="#data-preparation" id="toc-data-preparation">Data
-preparation</a></li>
+<li><a href="#data-preparation" id="toc-data-preparation"><span
+class="toc-section-number">1</span> Data preparation</a></li>
 <li><a href="#adding-summary-statistics-over-the-entire-data-over"
-id="toc-adding-summary-statistics-over-the-entire-data-over">Adding
-summary statistics over the entire data (<code>OVER</code>)</a></li>
+id="toc-adding-summary-statistics-over-the-entire-data-over"><span
+class="toc-section-number">2</span> Adding summary statistics over the
+entire data (<code>OVER</code>)</a></li>
 <li><a
 href="#summary-statistics-partitioned-by-some-variables-partition-by"
-id="toc-summary-statistics-partitioned-by-some-variables-partition-by">Summary
-statistics partitioned by some variables
-(<code>PARTITION BY</code>)</a></li>
+id="toc-summary-statistics-partitioned-by-some-variables-partition-by"><span
+class="toc-section-number">3</span> Summary statistics partitioned by
+some variables (<code>PARTITION BY</code>)</a></li>
 <li><a href="#cumulative-sumaverage"
-id="toc-cumulative-sumaverage">Cumulative sum/average</a></li>
+id="toc-cumulative-sumaverage"><span class="toc-section-number">4</span>
+Cumulative sum/average</a></li>
 </ul>
 </div>
 
-<div id="data-preparation" class="section level1">
-<h1>Data preparation</h1>
+<div id="data-preparation" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Data preparation</h1>
 <pre class="r"><code>library(nycflights13)
 library(tidyverse)
 set.seed(123)
@@ -366,9 +368,9 @@ dbListTables(con)</code></pre>
 ## [7] &quot;dest&quot;</code></pre>
 </div>
 <div id="adding-summary-statistics-over-the-entire-data-over"
-class="section level1">
-<h1>Adding summary statistics over the entire data
-(<code>OVER</code>)</h1>
+class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Adding summary
+statistics over the entire data (<code>OVER</code>)</h1>
 <p>The OVER clause can essentially add columns to the output data. Used
 just by itself, without any partitioning, the summary statistic over the
 entire column will be created as a new column. This can be useful in the
@@ -449,9 +451,9 @@ GROUP BY carrier</code></pre>
 </div>
 </div>
 <div id="summary-statistics-partitioned-by-some-variables-partition-by"
-class="section level1">
-<h1>Summary statistics partitioned by some variables
-(<code>PARTITION BY</code>)</h1>
+class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Summary statistics
+partitioned by some variables (<code>PARTITION BY</code>)</h1>
 <p>The PARTITION BY option makes OVER more powerful: it can act like a
 subquery in the sense that summary statistics are grouped.</p>
 <p>For the query below, notice how the average delays are
@@ -519,8 +521,9 @@ GROUP BY carrier, origin</code></pre>
 </table>
 </div>
 </div>
-<div id="cumulative-sumaverage" class="section level1">
-<h1>Cumulative sum/average</h1>
+<div id="cumulative-sumaverage" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Cumulative
+sum/average</h1>
 <p>This task is usually fairly straight forward in other languages, but
 in SQL, some specific keywords will be needed.</p>
 <p>The cumulative sum is specified as the average values from the

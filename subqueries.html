@@ -322,17 +322,43 @@ $(document).ready(function () {
 
 <div id="TOC">
 <ul>
-<li><a href="#data-preparation" id="toc-data-preparation">Data
-preparation</a></li>
-<li><a href="#case-when"
-id="toc-case-when"><code>CASE WHEN</code></a></li>
-<li><a href="#with-statement" id="toc-with-statement"><code>WITH</code>
+<li><a href="#data-preparation" id="toc-data-preparation"><span
+class="toc-section-number">1</span> Data preparation</a></li>
+<li><a href="#subqueries" id="toc-subqueries"><span
+class="toc-section-number">2</span> Subqueries</a>
+<ul>
+<li><a href="#subquery-in-where" id="toc-subquery-in-where"><span
+class="toc-section-number">2.1</span> Subquery in
+<code>WHERE</code></a></li>
+<li><a href="#subquery-in-the-from-statement"
+id="toc-subquery-in-the-from-statement"><span
+class="toc-section-number">2.2</span> Subquery in the <code>FROM</code>
 statement</a></li>
+<li><a href="#subquery-inside-the-select-clause"
+id="toc-subquery-inside-the-select-clause"><span
+class="toc-section-number">2.3</span> Subquery inside the
+<code>SELECT</code> clause</a></li>
+</ul></li>
+<li><a href="#improve-readability-using-the-with-statement"
+id="toc-improve-readability-using-the-with-statement"><span
+class="toc-section-number">3</span> Improve readability using the
+<code>WITH</code> statement</a>
+<ul>
+<li><a href="#with-can-be-used-on-multiple-tables"
+id="toc-with-can-be-used-on-multiple-tables"><span
+class="toc-section-number">3.1</span> <code>WITH</code> can be used on
+multiple tables</a></li>
+</ul></li>
+<li><a href="#case-when" id="toc-case-when"><span
+class="toc-section-number">4</span> <code>CASE WHEN</code></a></li>
+<li><a href="#correlated-subqueries"
+id="toc-correlated-subqueries"><span class="toc-section-number">5</span>
+Correlated subqueries</a></li>
 </ul>
 </div>
 
-<div id="data-preparation" class="section level1">
-<h1>Data preparation</h1>
+<div id="data-preparation" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Data preparation</h1>
 <p>Evaluated only once to create a CSV file.</p>
 <pre class="r"><code>library(nycflights13)
 library(tidyverse)
@@ -368,8 +394,523 @@ dbListTables(con)</code></pre>
 <pre><code>## [1] &quot;date&quot;      &quot;carrier&quot;   &quot;flight&quot;    &quot;arr_delay&quot; &quot;dep_delay&quot; &quot;origin&quot;   
 ## [7] &quot;dest&quot;</code></pre>
 </div>
-<div id="case-when" class="section level1">
-<h1><code>CASE WHEN</code></h1>
+<div id="subqueries" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Subqueries</h1>
+<p>SQL queries can be nested. The subquery can be any part of
+<code>SELECT</code>, <code>FROM</code>, <code>WHERE</code> and
+<code>GROUP BY</code>.</p>
+<p>The main ways that you can use a subquery:</p>
+<ol style="list-style-type: decimal">
+<li>Comparing groups to summarised values</li>
+<li>Reshaping data</li>
+<li>Combine data that cannot be joined</li>
+</ol>
+<div id="subquery-in-where" class="section level2" number="2.1">
+<h2><span class="header-section-number">2.1</span> Subquery in
+<code>WHERE</code></h2>
+<p>In the following example, we first check for the average departure
+delays in the <code>flights</code> data, across all carriers.</p>
+<pre class="sql"><code>SELECT AVG(dep_delay) FROM flights</code></pre>
+<div class="knitsql-table">
+<table>
+<caption>1 records</caption>
+<thead>
+<tr class="header">
+<th align="right">AVG(dep_delay)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">-0.23</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>We can then use this average value to filter for flights that are
+greater than the average departure delays.</p>
+<pre class="sql"><code>SELECT carrier, dep_delay
+FROM flights
+WHERE dep_delay &gt; (SELECT AVG(dep_delay) FROM flights)</code></pre>
+<div class="knitsql-table">
+<table>
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th align="left">carrier</th>
+<th align="right">dep_delay</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">UA</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">UA</td>
+<td align="right">4</td>
+</tr>
+<tr class="odd">
+<td align="left">AA</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">B6</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">B6</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">MQ</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">B6</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">UA</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">MQ</td>
+<td align="right">8</td>
+</tr>
+<tr class="even">
+<td align="left">UA</td>
+<td align="right">11</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>We can further summarise the average delays by carrier, restricting
+to only the 33 records above.</p>
+<pre class="sql"><code>SELECT carrier, AVG(dep_delay) AS carrier_avg_dep_delay
+FROM flights
+WHERE dep_delay &gt; (SELECT AVG(dep_delay) FROM flights)
+GROUP BY carrier</code></pre>
+<div class="knitsql-table">
+<table>
+<caption>6 records</caption>
+<thead>
+<tr class="header">
+<th align="left">carrier</th>
+<th align="right">carrier_avg_dep_delay</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">AA</td>
+<td align="right">5.600000</td>
+</tr>
+<tr class="even">
+<td align="left">B6</td>
+<td align="right">1.285714</td>
+</tr>
+<tr class="odd">
+<td align="left">DL</td>
+<td align="right">4.333333</td>
+</tr>
+<tr class="even">
+<td align="left">EV</td>
+<td align="right">24.000000</td>
+</tr>
+<tr class="odd">
+<td align="left">MQ</td>
+<td align="right">15.666667</td>
+</tr>
+<tr class="even">
+<td align="left">UA</td>
+<td align="right">6.285714</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Note that, the <code>WHERE</code> clause has a higher order of
+operation than <code>SELECT.</code>. Thus, the result we generate is the
+carrier-specific results of the 33 records, and NOT the result
+restricted to only carriers that are greater than the average. To
+illustrate this, pay attention to the query below. We see that AA has an
+average departure delay of -0.58, which is less than the overall average
+of -0.23. But in the query above shows a result of 5.6 for AA. This is
+because the WHERE clause is executed first before SELECT.</p>
+<pre class="sql"><code>SELECT carrier, AVG(dep_delay) AS carrier_avg_dep_delay
+FROM flights
+GROUP BY carrier</code></pre>
+<div class="knitsql-table">
+<table>
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th align="left">carrier</th>
+<th align="right">carrier_avg_dep_delay</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">AA</td>
+<td align="right">-0.5882353</td>
+</tr>
+<tr class="even">
+<td align="left">AS</td>
+<td align="right">-1.0000000</td>
+</tr>
+<tr class="odd">
+<td align="left">B6</td>
+<td align="right">-1.9200000</td>
+</tr>
+<tr class="even">
+<td align="left">DL</td>
+<td align="right">-2.7692308</td>
+</tr>
+<tr class="odd">
+<td align="left">EV</td>
+<td align="right">5.0000000</td>
+</tr>
+<tr class="even">
+<td align="left">FL</td>
+<td align="right">-3.0000000</td>
+</tr>
+<tr class="odd">
+<td align="left">MQ</td>
+<td align="right">4.8333333</td>
+</tr>
+<tr class="even">
+<td align="left">UA</td>
+<td align="right">2.1538462</td>
+</tr>
+<tr class="odd">
+<td align="left">US</td>
+<td align="right">-4.2000000</td>
+</tr>
+<tr class="even">
+<td align="left">VX</td>
+<td align="right">-1.5000000</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Here is the general order of operations in an SQL query:</p>
+<ol style="list-style-type: decimal">
+<li>FROM clause: This clause specifies the tables that the query will
+operate on.</li>
+<li>WHERE clause: This clause specifies the conditions that must be met
+for a row to be included in the query results.</li>
+<li>GROUP BY clause: This clause groups the rows of the query result
+into sets based on the values of one or more columns.</li>
+<li>HAVING clause: This clause filters the grouped rows based on a
+specified condition.</li>
+<li>SELECT clause: This clause specifies the columns that will be
+included in the query results.</li>
+<li>ORDER BY clause: This clause specifies the order in which the rows
+of the query result will be sorted.</li>
+</ol>
+</div>
+<div id="subquery-in-the-from-statement" class="section level2"
+number="2.2">
+<h2><span class="header-section-number">2.2</span> Subquery in the
+<code>FROM</code> statement</h2>
+<!-- This is a case where we can transform the data from long to wide format before selecting. -->
+<p>Note that this code will return an error, because that the
+<code>WHERE</code> clause can not operate on a variable that is being
+created in the <code>SELECT</code> clause. Again, because that the
+<code>SELECT</code> clause has a lower order of operation than
+<code>WHERE</code>, this is why <code>WHERE</code> cannot operate on a
+variable that has not been created yet.</p>
+<pre class="sql"><code>SELECT carrier, AVG(dep_delay) AS avg_dep_delay
+FROM flights as f
+WHERE avg_dep_delay &gt; 0
+GROUP BY carrier</code></pre>
+<pre><code>## Error: misuse of aggregate: AVG()</code></pre>
+<p>This problem can be solved by the <code>HAVING</code> clause as
+below.</p>
+<pre class="sql"><code>SELECT carrier, AVG(dep_delay) AS avg_dep_delay
+FROM flights as f
+GROUP BY carrier
+HAVING avg_dep_delay &gt; 0</code></pre>
+<div class="knitsql-table">
+<table>
+<caption>3 records</caption>
+<thead>
+<tr class="header">
+<th align="left">carrier</th>
+<th align="right">avg_dep_delay</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">EV</td>
+<td align="right">5.000000</td>
+</tr>
+<tr class="even">
+<td align="left">MQ</td>
+<td align="right">4.833333</td>
+</tr>
+<tr class="odd">
+<td align="left">UA</td>
+<td align="right">2.153846</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>However, we can also turn the query as a subquery and then perform
+additional operations on it.</p>
+<pre class="sql"><code>SELECT carrier, avg_dep_delay
+FROM (
+  SELECT carrier, AVG(dep_delay) AS avg_dep_delay
+  FROM flights as f
+  GROUP BY carrier)
+WHERE avg_dep_delay &gt; 0</code></pre>
+<div class="knitsql-table">
+<table>
+<caption>3 records</caption>
+<thead>
+<tr class="header">
+<th align="left">carrier</th>
+<th align="right">avg_dep_delay</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">EV</td>
+<td align="right">5.000000</td>
+</tr>
+<tr class="even">
+<td align="left">MQ</td>
+<td align="right">4.833333</td>
+</tr>
+<tr class="odd">
+<td align="left">UA</td>
+<td align="right">2.153846</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="subquery-inside-the-select-clause" class="section level2"
+number="2.3">
+<h2><span class="header-section-number">2.3</span> Subquery inside the
+<code>SELECT</code> clause</h2>
+<p>Here, we need to return a single value to compare against individual
+values.</p>
+<pre class="sql"><code>SELECT carrier, COUNT(carrier) AS num_flights
+FROM flights
+GROUP BY carrier</code></pre>
+<div class="knitsql-table">
+<table>
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th align="left">carrier</th>
+<th align="right">num_flights</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">AA</td>
+<td align="right">17</td>
+</tr>
+<tr class="even">
+<td align="left">AS</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">B6</td>
+<td align="right">25</td>
+</tr>
+<tr class="even">
+<td align="left">DL</td>
+<td align="right">13</td>
+</tr>
+<tr class="odd">
+<td align="left">EV</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">FL</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">MQ</td>
+<td align="right">6</td>
+</tr>
+<tr class="even">
+<td align="left">UA</td>
+<td align="right">26</td>
+</tr>
+<tr class="odd">
+<td align="left">US</td>
+<td align="right">5</td>
+</tr>
+<tr class="even">
+<td align="left">VX</td>
+<td align="right">2</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="improve-readability-using-the-with-statement"
+class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Improve readability
+using the <code>WITH</code> statement</h1>
+<!-- ```{sql, connection=con} -->
+<!-- SELECT f.carrier, AVG(f.dep_delay) AS mean_dep_delay -->
+<!-- FROM flights AS f -->
+<!-- INNER JOIN airlines AS a -->
+<!--   ON f.carrier = a.carrier -->
+<!-- GROUP BY f.carrier -->
+<!-- ``` -->
+<p>In the example below, a full SQL query summarising the departure
+delay as a table, <code>t</code>. Another operation is performed on this
+summarised table to extract the maximum average departure delay
+carrier.</p>
+<pre class="sql"><code>WITH t as (SELECT f.carrier, a.name, AVG(f.dep_delay) AS mean_dep_delay
+      FROM flights AS f
+      INNER JOIN airlines AS a
+        ON f.carrier = a.carrier
+      GROUP BY f.carrier)
+SELECT *
+FROM t
+WHERE t.mean_dep_delay = (SELECT MAX(t.mean_dep_delay) FROM t);</code></pre>
+<div class="knitsql-table">
+<table>
+<caption>1 records</caption>
+<thead>
+<tr class="header">
+<th align="left">carrier</th>
+<th align="left">name</th>
+<th align="right">mean_dep_delay</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">EV</td>
+<td align="left">ExpressJet Airlines Inc.</td>
+<td align="right">5</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="with-can-be-used-on-multiple-tables" class="section level2"
+number="3.1">
+<h2><span class="header-section-number">3.1</span> <code>WITH</code> can
+be used on multiple tables</h2>
+<p>The only thing needed here is to use a comma to separate the
+different tables.</p>
+<pre class="sql"><code>WITH 
+  nyc_airports AS 
+    (SELECT faa, name
+     FROM airports
+     WHERE faa IN (&quot;LGA&quot;, &quot;JFK&quot;, &quot;EWR&quot;)),
+  other_airports AS 
+    (SELECT * FROM airports)
+SELECT carrier, origin, dest, nyc_airports.name AS origin_name, other_airports.name AS dest_name
+FROM flights
+INNER JOIN nyc_airports
+ON flights.origin = nyc_airports.faa
+INNER JOIN other_airports
+ON flights.dest = other_airports.faa</code></pre>
+<div class="knitsql-table">
+<table>
+<caption>Displaying records 1 - 10</caption>
+<colgroup>
+<col width="11%" />
+<col width="9%" />
+<col width="6%" />
+<col width="27%" />
+<col width="44%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">carrier</th>
+<th align="left">origin</th>
+<th align="left">dest</th>
+<th align="left">origin_name</th>
+<th align="left">dest_name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">AA</td>
+<td align="left">EWR</td>
+<td align="left">DFW</td>
+<td align="left">Newark Liberty Intl</td>
+<td align="left">Dallas Fort Worth Intl</td>
+</tr>
+<tr class="even">
+<td align="left">AA</td>
+<td align="left">EWR</td>
+<td align="left">MIA</td>
+<td align="left">Newark Liberty Intl</td>
+<td align="left">Miami Intl</td>
+</tr>
+<tr class="odd">
+<td align="left">AS</td>
+<td align="left">EWR</td>
+<td align="left">SEA</td>
+<td align="left">Newark Liberty Intl</td>
+<td align="left">Seattle Tacoma Intl</td>
+</tr>
+<tr class="even">
+<td align="left">B6</td>
+<td align="left">EWR</td>
+<td align="left">FLL</td>
+<td align="left">Newark Liberty Intl</td>
+<td align="left">Fort Lauderdale Hollywood Intl</td>
+</tr>
+<tr class="odd">
+<td align="left">B6</td>
+<td align="left">EWR</td>
+<td align="left">PBI</td>
+<td align="left">Newark Liberty Intl</td>
+<td align="left">Palm Beach Intl</td>
+</tr>
+<tr class="even">
+<td align="left">DL</td>
+<td align="left">EWR</td>
+<td align="left">ATL</td>
+<td align="left">Newark Liberty Intl</td>
+<td align="left">Hartsfield Jackson Atlanta Intl</td>
+</tr>
+<tr class="odd">
+<td align="left">EV</td>
+<td align="left">EWR</td>
+<td align="left">IAD</td>
+<td align="left">Newark Liberty Intl</td>
+<td align="left">Washington Dulles Intl</td>
+</tr>
+<tr class="even">
+<td align="left">EV</td>
+<td align="left">EWR</td>
+<td align="left">MSP</td>
+<td align="left">Newark Liberty Intl</td>
+<td align="left">Minneapolis St Paul Intl</td>
+</tr>
+<tr class="odd">
+<td align="left">MQ</td>
+<td align="left">EWR</td>
+<td align="left">ORD</td>
+<td align="left">Newark Liberty Intl</td>
+<td align="left">Chicago Ohare Intl</td>
+</tr>
+<tr class="even">
+<td align="left">MQ</td>
+<td align="left">EWR</td>
+<td align="left">ORD</td>
+<td align="left">Newark Liberty Intl</td>
+<td align="left">Chicago Ohare Intl</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="case-when" class="section level1" number="4">
+<h1><span class="header-section-number">4</span>
+<code>CASE WHEN</code></h1>
 <p>This function is rather straight-forward. The syntax generally
 follows that: CASE WHEN logical THEN encoding ELSE encoding END.</p>
 <p>In general, it changes how variables are encoded and will allow us to
@@ -511,48 +1052,153 @@ FROM flights as f</code></pre>
 </table>
 </div>
 </div>
-<div id="with-statement" class="section level1">
-<h1><code>WITH</code> statement</h1>
-<p>This example is a little bit basic. However, I think it illustrate an
-important difference between
-<code>R-dplyr</code>/<code>Python-pandas</code>and <code>SQL</code>. The
-syntax in R/Python is largely consistent and linear, which makes it more
-human-readable. Whereas <code>SQL</code> is a bit more cumbersome. E.g.
-<code>WHERE</code> and <code>HAVING</code> subset on
-<strong>records</strong> and <strong>summary of records</strong>
-respectively when <code>dplyr</code> simply uses
-<code>filter</code>.</p>
-<!-- ```{sql, connection=con} -->
-<!-- SELECT f.carrier, AVG(f.dep_delay) AS mean_dep_delay -->
-<!-- FROM flights AS f -->
-<!-- INNER JOIN airlines AS a -->
-<!--   ON f.carrier = a.carrier -->
-<!-- GROUP BY f.carrier -->
-<!-- ``` -->
-<pre class="sql"><code>WITH t as (SELECT f.carrier, a.name, AVG(f.dep_delay) AS mean_dep_delay
-      FROM flights AS f
-      INNER JOIN airlines AS a
-        ON f.carrier = a.carrier
-      GROUP BY f.carrier)
-      
-SELECT *
-FROM t
-WHERE t.mean_dep_delay = (SELECT MAX(t.mean_dep_delay) FROM t);</code></pre>
+<div id="correlated-subqueries" class="section level1" number="5">
+<h1><span class="header-section-number">5</span> Correlated
+subqueries</h1>
+<p>Correlated subqueries are subqueries that reference one or more
+columns in the main query. Correlated subqueries depend on information
+in the main query to run, and thus, cannot be executed on their own.</p>
+<p>Correlated subqueries are evaluated in SQL once per row of data
+retrieved, a process that takes a lot more computing power and time than
+a simple subquery.</p>
+<p>In the example below, the subquery in the WHERE clause will first
+calculate the average arrival delay for each carrier. This information
+is computed carrier by carrier and only the flights with with the
+arrival delay less than that carrier’s average are returned for the main
+query.</p>
+<pre class="sql"><code>SELECT 
+  main.carrier, 
+  main.arr_delay
+FROM flights as main
+WHERE 
+  main.arr_delay &lt; 
+  (
+    SELECT AVG(sub.arr_delay)
+    FROM flights as sub
+    WHERE main.carrier = sub.carrier
+  )</code></pre>
 <div class="knitsql-table">
 <table>
-<caption>1 records</caption>
+<caption>Displaying records 1 - 10</caption>
 <thead>
 <tr class="header">
 <th align="left">carrier</th>
-<th align="left">name</th>
-<th align="right">mean_dep_delay</th>
+<th align="right">arr_delay</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
+<td align="left">B6</td>
+<td align="right">-18</td>
+</tr>
+<tr class="even">
+<td align="left">DL</td>
+<td align="right">-25</td>
+</tr>
+<tr class="odd">
 <td align="left">EV</td>
-<td align="left">ExpressJet Airlines Inc.</td>
-<td align="right">5</td>
+<td align="right">-14</td>
+</tr>
+<tr class="even">
+<td align="left">B6</td>
+<td align="right">-8</td>
+</tr>
+<tr class="odd">
+<td align="left">AA</td>
+<td align="right">8</td>
+</tr>
+<tr class="even">
+<td align="left">B6</td>
+<td align="right">-2</td>
+</tr>
+<tr class="odd">
+<td align="left">B6</td>
+<td align="right">-3</td>
+</tr>
+<tr class="even">
+<td align="left">UA</td>
+<td align="right">-14</td>
+</tr>
+<tr class="odd">
+<td align="left">B6</td>
+<td align="right">-4</td>
+</tr>
+<tr class="even">
+<td align="left">UA</td>
+<td align="right">-8</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>This information is, in theory, identical to this query, which is
+more spread out and explicit in how the JOIN operation is used.</p>
+<p>Using a join instead of a subquery can be more efficient because the
+database engine can optimize the join operation and potentially use
+indexes on the carrier column. In contrast, a subquery may require the
+database engine to perform a separate query for each row in the main
+table, which can be slow for large datasets.</p>
+<pre class="sql"><code>SELECT 
+  main.carrier, 
+  main.arr_delay
+FROM flights as main
+JOIN 
+  (
+    SELECT carrier, AVG(arr_delay) as avg_delay
+    FROM flights
+    GROUP BY carrier
+  ) as sub
+ON 
+  main.carrier = sub.carrier
+  AND main.arr_delay &lt; sub.avg_delay</code></pre>
+<div class="knitsql-table">
+<table>
+<caption>Displaying records 1 - 10</caption>
+<thead>
+<tr class="header">
+<th align="left">carrier</th>
+<th align="right">arr_delay</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">B6</td>
+<td align="right">-18</td>
+</tr>
+<tr class="even">
+<td align="left">DL</td>
+<td align="right">-25</td>
+</tr>
+<tr class="odd">
+<td align="left">EV</td>
+<td align="right">-14</td>
+</tr>
+<tr class="even">
+<td align="left">B6</td>
+<td align="right">-8</td>
+</tr>
+<tr class="odd">
+<td align="left">AA</td>
+<td align="right">8</td>
+</tr>
+<tr class="even">
+<td align="left">B6</td>
+<td align="right">-2</td>
+</tr>
+<tr class="odd">
+<td align="left">B6</td>
+<td align="right">-3</td>
+</tr>
+<tr class="even">
+<td align="left">UA</td>
+<td align="right">-14</td>
+</tr>
+<tr class="odd">
+<td align="left">B6</td>
+<td align="right">-4</td>
+</tr>
+<tr class="even">
+<td align="left">UA</td>
+<td align="right">-8</td>
 </tr>
 </tbody>
 </table>

@@ -34,3 +34,4 @@ output:
     df_print: paged
     toc: true
     toc_depth: 2
+    number_sections: true

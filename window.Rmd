@@ -1,8 +1,6 @@
 ---
-title: "Window"
+title: "Window functions"
 author: "Kevin Wang"
-date: "5 December 2022"
-output: html_document
 ---
 
 # Data preparation 

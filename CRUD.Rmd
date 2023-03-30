@@ -1,8 +1,6 @@
 ---
 title: "Create, review, update and delete"
 author: "Kevin Wang"
-date: "19 Nov 2022"
-output: html_document
 ---
 
 # Setting up connection (in `RSQLite`)

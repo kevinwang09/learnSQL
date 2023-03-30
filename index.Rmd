@@ -1,7 +1,9 @@
 ---
 title: "Learn SQL"
-output: html_document
 author: Kevin Wang Ph.D.
+output:
+  html_document:
+    number_sections: false
 ---
 
 # Why I am making this site?

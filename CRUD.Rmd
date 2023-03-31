@@ -1,6 +1,8 @@
 ---
 title: "Create, review, update and delete"
 author: "Kevin Wang"
+date: "19 Nov 2022"
+output: html_document
 ---
 
 # Setting up connection (in `RSQLite`)
@@ -9,6 +11,8 @@ This chunk of code will take the in-memory data and allow this data to be querie
 
 ```{r, warning=FALSE, message=FALSE}
 library(dplyr)
+library(readr)
+library(lubridate)
 library(DBI)
 # Create an ephemeral in-memory RSQLite database
 con = dbConnect(RSQLite::SQLite(), ":memory:")

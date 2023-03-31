@@ -1,6 +1,4 @@
-description: |
-  Learn SQL
-output_dir: "."
+# This file controls the layout of the website. 
 navbar:
   icon: fa-home
   title: "Learning SQL"
@@ -17,7 +15,7 @@ navbar:
       menu:
         - text: Subqueries - case when, with
           href: https://kevinwang09.github.io/learnSQL/subqueries.html
-        - text: Window functions
+        - text: Window
           href: https://kevinwang09.github.io/learnSQL/window.html
   right:
     - text: "Source code"
@@ -26,9 +24,13 @@ navbar:
     - text: "About me"
       icon: fa-user-tie
       href: https://kevinwangstats.com
-  search: true
-output: 
-  distill::distill_article:
+output_dir: "."
+exclude: ["README*"]
+output:
+  html_document:
+    theme: paper
+    highlight: textmate
+    css: "style.css"
     df_print: paged
     toc: true
     toc_depth: 2

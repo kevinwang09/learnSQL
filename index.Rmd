@@ -1,11 +1,11 @@
 ---
 title: "Learn SQL"
 author: Kevin Wang Ph.D.
-description: ""
+output:
+  html_document:
+    number_sections: false
 ---
 
-I want this to be a personal repository of SQL codes that I write for my own future references. Unlike other online tutorials, I have taken some efforts to make sure this site is fully reproducible (with some basic `R` setups).
+# Why I am making this site?
 
-You could either read the individual articles or you could simply search for keywords.
-
-The data that I have used for demo are available as CSV files.
+I want this to be a personal repository of SQL codes that I write for my own future references. Unlike other online tutorials, I have taken some efforts to make sure this site is fully reproducible (with some basic R setups).

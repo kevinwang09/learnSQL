@@ -1,15 +1,17 @@
 ---
-title: "Window functions"
+title: "Window"
 author: "Kevin Wang"
+date: "5 December 2022"
+output: html_document
 ---
 
 # Data preparation 
 
 ```{r, eval = FALSE}
 library(nycflights13)
+library(dplyr)
 library(readr)
 library(lubridate)
-library(dplyr)
 set.seed(123)
 readr::write_csv(x = nycflights13::airports %>% 
                    dplyr::select(faa, name), 

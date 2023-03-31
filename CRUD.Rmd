@@ -10,7 +10,6 @@ This chunk of code will take the in-memory data and allow this data to be querie
 ```{r, warning=FALSE, message=FALSE}
 library(dplyr)
 library(DBI)
-library(tidyverse)
 # Create an ephemeral in-memory RSQLite database
 con = dbConnect(RSQLite::SQLite(), ":memory:")
 # tbl = tibble(

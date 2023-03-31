@@ -9,7 +9,9 @@ Evaluated only once to create a CSV file.
 
 ```{r, eval = FALSE}
 library(nycflights13)
-library(tidyverse)
+library(readr)
+library(lubridate)
+library(dplyr)
 set.seed(123)
 readr::write_csv(x = nycflights13::airports %>% 
                    dplyr::select(faa, name), 

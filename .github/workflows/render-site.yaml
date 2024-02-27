@@ -29,7 +29,7 @@ jobs:
           Rscript -e 'install.packages(c(
           "remotes", "rmarkdown", "knitr", "distill", 
           "dplyr", "readr", "lubridate",
-          "DBI", "RSQLite", "nycflights13", "palmerpenguins"))'
+          "DBI", "RSQLite", "nycflights13", "palmerpenguins", "reticulate"))'
           Rscript -e 'rmarkdown::render_site(input = ".")'
       
       - name: Deploy site

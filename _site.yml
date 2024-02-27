@@ -5,6 +5,8 @@ navbar:
   left:
     - text: "Basics"
       menu:
+        - text: Guiding principles
+          href: https://kevinwang09.github.io/learnSQL/guides.html
         - text: Basic operations
           href: https://kevinwang09.github.io/learnSQL/basic.html
         - text: Table - Create, review, update, delete

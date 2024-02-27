@@ -3,7 +3,6 @@ title: "Learn SQL"
 author: Kevin Wang Ph.D.
 output:
   html_document:
-    toc: false
     number_sections: false
 ---
 

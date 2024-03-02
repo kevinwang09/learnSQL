@@ -7,10 +7,10 @@ navbar:
       menu:
         - text: Guiding principles
           href: https://kevinwang09.github.io/learnSQL/guides.html
-        - text: Basic operations
-          href: https://kevinwang09.github.io/learnSQL/basic.html
-        - text: Table - Create, review, update, delete
-          href: https://kevinwang09.github.io/learnSQL/CRUD.html
+        - text: Basic data creation
+          href: https://kevinwang09.github.io/learnSQL/basic_ddl.html
+        - text: Basic data manipulation
+          href: https://kevinwang09.github.io/learnSQL/basic_dml.html
         - text: Join operations
           href: https://kevinwang09.github.io/learnSQL/join.html
     - text: "Intermediates"

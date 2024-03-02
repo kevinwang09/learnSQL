@@ -1,0 +1,190 @@
+---
+title: "Basic Data Definition Language (DDL)"
+author: "Kevin Wang"
+date: "19 Nov 2022"
+output: html_document
+---
+
+# Setting up connection (in `RSQLite`)
+
+This chunk of code will take the in-memory data and allow this data to be queried exactly like a SQL database. 
+
+```{r, warning=FALSE, message=FALSE}
+library(dplyr)
+library(readr)
+library(lubridate)
+library(DBI)
+# Create an ephemeral in-memory RSQLite database
+con = dbConnect(RSQLite::SQLite(), ":memory:")
+# tbl = tibble(
+#   numbers = 1:5, 
+#   letters = letters[1:5])
+dbListTables(con)
+
+# dbWriteTable(con, "tbl", tbl)
+# dbListTables(con)
+# dbListFields(con, "tbl")
+```
+
+
+# Creating a table
+
+In this section, we create a table named `tbl` with two columns: `numbers` and `letters.` This is the foundational step in database management, where we define the schema of our data.
+
+Options for column creation:
+
++ `PRIMARY KEY`: Ensures each row in the table is unique.
++ `NOT NULL`: Ensures that a column cannot have a NULL value.
+
+```{sql, connection=con}
+/*Creating a table called tbl, with the columns numbers and letters*/
+CREATE TABLE tbl (
+  numbers INT PRIMARY KEY, 
+  letters VARCHAR(10) NOT NULL
+);
+```
+
+After creating the table, we can start inserting data into it. Here, rows are added to `tbl`, each containing values for numbers and letters. This operation exemplifies the 'Create' in CRUD.
+
++ Batch Insertion: Allows inserting multiple rows in a single statement.
++ Specifying Columns: Ensures clarity and prevents errors by specifying which values belong to which columns.
+
+```{sql, connection=con}
+INSERT INTO tbl
+ (numbers, letters)
+VALUES
+ (1, "A"),
+ (2, "B"),
+ (3, "C");
+```
+
+```{sql, connection=con}
+SELECT *
+FROM tbl;
+```
+
+# Inserting rows
+
+```{sql, connection=con}
+INSERT INTO tbl
+ (numbers, letters)
+VALUES
+ (4, "D");
+```
+
+```{sql, connection=con}
+SELECT *
+FROM tbl;
+```
+
+# Editing rows
+
+Editing or updating rows in a table is essential for maintaining accurate and current data. This section demonstrates how to update the letters column of certain rows based on their numbers values.
+
++ Conditional Updates: Modify rows based on specific conditions.
++ Update Multiple Columns: It's possible to update more than one column in the same UPDATE statement.
+
+```{sql, connection=con}
+UPDATE tbl
+SET 
+  letters = 'Unknown'
+WHERE 
+  numbers IN (2, 3)
+```
+
+```{sql, connection=con}
+SELECT *
+FROM tbl;
+```
+
+# Deleting rows
+
+This section covers how to remove rows from tbl where the letters column matches a certain condition. Deleting rows is a critical operation for managing the lifecycle of data within a database.
+
++ Conditional Deletion: Delete rows based on specific conditions.
+
+```{sql, connection=con}
+DELETE FROM tbl WHERE letters = 'Unknown'
+```
+
+```{sql, connection=con}
+SELECT *
+FROM tbl;
+```
+
++ Bulk Deletion: Remove a large number of rows based on a criterion.
+
+# Adding a new column
+
+Here we demonstrate how to add a new column `n2` to the existing table `tbl.` Altering a table to add new columns supports evolving data requirements.
+
++ Data Type Specification: Choose the appropriate data type for the new column.
+
+```{sql, connection=con}
+ALTER TABLE tbl
+  ADD n2 DECIMAL (10, 2);
+```
+
+```{sql, connection=con}
+SELECT *
+FROM tbl
+```
+
++ Default Values: Optionally, set a default value for the new column.
+
+```{sql, connection=con}
+UPDATE tbl 
+SET n2 = numbers;
+```
+
+```{sql, connection=con}
+SELECT *
+FROM tbl
+```
+
+`UPDATE...SET...` allows one to set values for the columns.
+
+```{sql, connection=con}
+UPDATE tbl 
+SET n2 = numbers * 2
+WHERE letters = 'A';
+```
+
+```{sql, connection=con}
+SELECT *
+FROM tbl
+```
+
+# Enforcing uniqueness in the columns
+
+Ensuring that a column contains only unique values is crucial for data integrity, especially for identifiers like an ID column.
+
++ `UNIQUE` Constraint: Guarantees that all values in a column are different.
+
++ `PRIMARY KEY` Constraint: A special case of unique constraint, making a column a unique identifier for rows.
+This structured approach, using SQL operations within an RMarkdown document, provides a practical demonstration of managing a database through DDL and DML operations, directly applicable in data science and analytics projects.
+
+```{sql, connection=con}
+CREATE TABLE uniquetbl (
+  ID INT NOT NULL UNIQUE, 
+  letters VARCHAR(10)
+);
+```
+
+```{sql, connection=con}
+/* This works */
+INSERT INTO uniquetbl
+ (ID, letters)
+VALUES
+ (1, "A"),
+ (2, "B"),
+ (3, "C");
+```
+
+```{sql, connection=con, error=TRUE}
+/* But this will create an error */
+INSERT INTO uniquetbl
+ (ID, letters)
+VALUES
+ (1, "D");
+```

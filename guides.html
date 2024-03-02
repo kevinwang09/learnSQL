@@ -259,10 +259,10 @@ $(document).ready(function () {
       <a href="https://kevinwang09.github.io/learnSQL/guides.html">Guiding principles</a>
     </li>
     <li>
-      <a href="https://kevinwang09.github.io/learnSQL/basic.html">Basic operations</a>
+      <a href="https://kevinwang09.github.io/learnSQL/basic_ddl.html">Basic data creation</a>
     </li>
     <li>
-      <a href="https://kevinwang09.github.io/learnSQL/CRUD.html">Table - Create, review, update, delete</a>
+      <a href="https://kevinwang09.github.io/learnSQL/basic_dml.html">Basic data manipulation</a>
     </li>
     <li>
       <a href="https://kevinwang09.github.io/learnSQL/join.html">Join operations</a>
@@ -316,31 +316,40 @@ $(document).ready(function () {
 
 <div id="TOC">
 <ul>
-<li><a href="#some-basic-principles"
-id="toc-some-basic-principles"><span class="toc-section-number">1</span>
-Some basic principles</a>
-<ul>
 <li><a href="#why-use-relational-database"
 id="toc-why-use-relational-database"><span
-class="toc-section-number">1.1</span> Why use relational
+class="toc-section-number">1</span> Why use relational
 database?</a></li>
 <li><a href="#connection-to-a-database"
 id="toc-connection-to-a-database"><span
-class="toc-section-number">1.2</span> Connection to a database</a></li>
-<li><a href="#ordering-of-the-verbs"
-id="toc-ordering-of-the-verbs"><span
-class="toc-section-number">1.3</span> Ordering of the verbs</a></li>
+class="toc-section-number">2</span> Connection to a database</a></li>
+<li><a
+href="#data-definition-language-ddl-vs-data-manipulation-language-dml"
+id="toc-data-definition-language-ddl-vs-data-manipulation-language-dml"><span
+class="toc-section-number">3</span> Data Definition Language (DDL) vs
+Data Manipulation Language (DML)</a>
+<ul>
+<li><a href="#examples-of-ddl" id="toc-examples-of-ddl"><span
+class="toc-section-number">3.1</span> Examples of DDL</a></li>
+<li><a href="#examples-of-dml" id="toc-examples-of-dml"><span
+class="toc-section-number">3.2</span> Examples of DML</a></li>
 </ul></li>
+<li><a href="#version-controlling-a-table"
+id="toc-version-controlling-a-table"><span
+class="toc-section-number">4</span> Version Controlling a Table</a></li>
+<li><a href="#ordering-of-the-verbs"
+id="toc-ordering-of-the-verbs"><span class="toc-section-number">5</span>
+Ordering of the verbs</a></li>
+<li><a href="#using-sql-script-for-analytics"
+id="toc-using-sql-script-for-analytics"><span
+class="toc-section-number">6</span> Using SQL script for
+analytics</a></li>
 </ul>
 </div>
 
-<div id="some-basic-principles" class="section level1" number="1">
-<h1><span class="header-section-number">1</span> Some basic
-principles</h1>
-<div id="why-use-relational-database" class="section level2"
-number="1.1">
-<h2><span class="header-section-number">1.1</span> Why use relational
-database?</h2>
+<div id="why-use-relational-database" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Why use relational
+database?</h1>
 <p>A relational database is a set of tables (datasets with rows and
 columns) that contain information relating to other tables in the
 database.</p>
@@ -359,9 +368,9 @@ use it at the same time while keeping the data safe and sound, showing
 why they’re a go-to choice for managing detailed and interconnected data
 in a clean and efficient way.</p>
 </div>
-<div id="connection-to-a-database" class="section level2" number="1.2">
-<h2><span class="header-section-number">1.2</span> Connection to a
-database</h2>
+<div id="connection-to-a-database" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Connection to a
+database</h1>
 <p>“Connection to a database will depend on what sort of database we are
 working with and what programming language we are using. In this
 section, we will explore how to connect to both SQLite and MySQL
@@ -418,9 +427,94 @@ for movie in movies:
 conn.commit()
 conn.close()</code></pre>
 </div>
-<div id="ordering-of-the-verbs" class="section level2" number="1.3">
-<h2><span class="header-section-number">1.3</span> Ordering of the
-verbs</h2>
+<div id="data-definition-language-ddl-vs-data-manipulation-language-dml"
+class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Data Definition
+Language (DDL) vs Data Manipulation Language (DML)</h1>
+<p>In the context of SQL, operations on databases are categorized into
+two main types: Data Definition Language (DDL) and Data Manipulation
+Language (DML). These categories help organize the types of commands
+used to interact with databases and their data.</p>
+<div id="examples-of-ddl" class="section level2" number="3.1">
+<h2><span class="header-section-number">3.1</span> Examples of DDL</h2>
+<p>DDL statements are used for defining, altering, and deleting database
+objects like tables, indexes, and schemas. Here are some examples:</p>
+<ol style="list-style-type: decimal">
+<li>CREATE: Used to create a new table or database.</li>
+</ol>
+<pre class="sql"><code>CREATE TABLE students (
+    student_id INT PRIMARY KEY,
+    name VARCHAR(100),
+    enrollment_date DATE
+);</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li>ALTER: Used to modify an existing database object, such as adding a
+column to a table.</li>
+</ol>
+<pre class="sql"><code>ALTER TABLE students ADD COLUMN email VARCHAR(255);</code></pre>
+<ol start="3" style="list-style-type: decimal">
+<li>TRUNCATE: Used to delete all rows in a table without removing the
+table itself.</li>
+</ol>
+<pre class="sql"><code>TRUNCATE TABLE students;</code></pre>
+<ol start="4" style="list-style-type: decimal">
+<li>DROP: Used to delete an object from the database, such as a
+table.</li>
+</ol>
+<pre class="sql"><code>DROP TABLE students;</code></pre>
+</div>
+<div id="examples-of-dml" class="section level2" number="3.2">
+<h2><span class="header-section-number">3.2</span> Examples of DML</h2>
+<p>DML statements are used for inserting, querying, updating, and
+deleting data in the tables. These operations correspond to the CRUD
+(Create, Read, Update, Delete) operations. Here are some examples:</p>
+<ol style="list-style-type: decimal">
+<li>INSERT (Create): Used to insert data into a table.</li>
+</ol>
+<pre class="sql"><code>INSERT INTO students (student_id, name, enrollment_date)
+VALUES (1, &#39;John Doe&#39;, &#39;2021-09-01&#39;);</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li>SELECT (Read): Used to query data from a table.</li>
+</ol>
+<pre class="sql"><code>SELECT * FROM students WHERE student_id = 1;</code></pre>
+<ol start="3" style="list-style-type: decimal">
+<li>UPDATE (Update): Used to modify existing data in a table.</li>
+</ol>
+<pre class="sql"><code>UPDATE students SET email = &#39;john.doe@example.com&#39; WHERE student_id = 1;</code></pre>
+<ol start="4" style="list-style-type: decimal">
+<li>DELETE (Delete): Used to remove data from a table.</li>
+</ol>
+<pre class="sql"><code>DELETE FROM students WHERE student_id = 1;</code></pre>
+</div>
+</div>
+<div id="version-controlling-a-table" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Version Controlling a
+Table</h1>
+<p>When managing databases, it’s often necessary to create a copy or
+version of a table. This can be for various reasons such as backup,
+testing, or version control purposes. SQL provides a straightforward
+method to accomplish this by using a CREATE TABLE AS SELECT statement.
+This command creates a new table and populates it with data selected
+from another table. This method is particularly useful for creating a
+snapshot of the current state of a table, which can serve as a version
+control mechanism.</p>
+<p>To copy a table, you essentially create a new table with the same
+structure and data as the original. This is useful for backup purposes
+or when you need a duplicate for testing without affecting the original
+data.</p>
+<p>Here’s how you can copy a table named
+<code>original_table_20230301</code> to a new table called
+<code>backup_table</code>:</p>
+<pre class="sql"><code>CREATE TABLE original_table_20230301 AS
+SELECT *
+FROM original_table;</code></pre>
+<p>If you only want to copy the structure of that table but not the
+data, you can add an additional <code>WHERE 1=0</code> at the end, as
+this statement is always evaluated to false, no data will be copied.</p>
+</div>
+<div id="ordering-of-the-verbs" class="section level1" number="5">
+<h1><span class="header-section-number">5</span> Ordering of the
+verbs</h1>
 <p>When composing SQL queries, the sequence in which you arrange various
 clauses is crucial for the database to correctly execute commands and
 retrieve data. SQL syntax necessitates a specific order of operations,
@@ -429,37 +523,38 @@ efficient. Here’s an elaboration of the order of operations in an SQL
 query, emphasizing the hierarchy of SQL verbs and including examples for
 each:</p>
 <ol style="list-style-type: decimal">
-<li><p>SELECT: Specifies the columns to return. You can also perform
-calculations or transformations on the data here (e.g., SELECT name,
-SUM(sales) for aggregate sales by name).</p></li>
-<li><p>FROM: Indicates the table(s) from which data will be retrieved
-(e.g., FROM sales_table). This clause sets the context for the source of
-your data.</p></li>
-<li><p>JOIN: Used for combining rows from two or more tables based on a
-related column between them (e.g., JOIN product_table ON
-sales_table.product_id = product_table.id). The JOIN clause, which
+<li><p><code>SELECT</code>: Specifies the columns to return. You can
+also perform calculations or transformations on the data here (e.g.,
+SELECT name, SUM(sales) for aggregate sales by name).</p></li>
+<li><p><code>FROM</code>: Indicates the table(s) from which data will be
+retrieved (e.g., FROM sales_table). This clause sets the context for the
+source of your data.</p></li>
+<li><p><code>JOIN</code>: Used for combining rows from two or more
+tables based on a related column between them (e.g., JOIN product_table
+ON sales_table.product_id = product_table.id). The JOIN clause, which
 follows FROM, details the type of join (INNER, LEFT, RIGHT, FULL OUTER)
 and the conditions for joining.</p></li>
-<li><p>WHERE: Filters rows based on specific conditions (e.g., WHERE
-sales_date &gt; ‘2023-01-01’). Only rows that meet these criteria will
-be included in the output. This clause is applied before the data is
-grouped.</p></li>
-<li><p>GROUP BY: Groups rows that have the same values in specified
-columns into summary rows (e.g., GROUP BY product_category). Essential
-for aggregate functions (SUM, AVG, MAX, etc.), it organizes the data
-into subsets for aggregation.</p></li>
-<li><p>HAVING: Filters groups of data after they have been aggregated
-with GROUP BY (e.g., HAVING SUM(sales) &gt; 1000). WHERE filters
-individual rows, HAVING filters aggregated groups.</p></li>
-<li><p>ORDER BY: Determines the order of the final set of rows returned,
-based on one or more columns (e.g., ORDER BY total_sales DESC).
-Specifies ascending (ASC) or descending (DESC) order.</p></li>
-<li><p>LIMIT (or FETCH): Limits the number of rows returned by the
-query, useful for handling large datasets or implementing pagination
-(e.g., LIMIT 10 for the top 10 rows).</p></li>
-<li><p>OFFSET: Skips a specified number of rows before starting to
-return rows from the query result (e.g., OFFSET 5 to skip the first 5
-rows). Often used with LIMIT for paginated data retrieval.</p></li>
+<li><p><code>WHERE</code>: Filters rows based on specific conditions
+(e.g., WHERE sales_date &gt; ‘2023-01-01’). Only rows that meet these
+criteria will be included in the output. This clause is applied before
+the data is grouped.</p></li>
+<li><p><code>GROUP BY</code>: Groups rows that have the same values in
+specified columns into summary rows (e.g., GROUP BY product_category).
+Essential for aggregate functions (SUM, AVG, MAX, etc.), it organizes
+the data into subsets for aggregation.</p></li>
+<li><p><code>HAVING</code>: Filters groups of data after they have been
+aggregated with GROUP BY (e.g., HAVING SUM(sales) &gt; 1000). WHERE
+filters individual rows, HAVING filters aggregated groups.</p></li>
+<li><p><code>ORDER BY</code>: Determines the order of the final set of
+rows returned, based on one or more columns (e.g., ORDER BY total_sales
+DESC). Specifies ascending (ASC) or descending (DESC) order.</p></li>
+<li><p><code>LIMIT</code> (or <code>FETCH</code>): Limits the number of
+rows returned by the query, useful for handling large datasets or
+implementing pagination (e.g., LIMIT 10 for the top 10 rows).</p></li>
+<li><p><code>OFFSET</code>: Skips a specified number of rows before
+starting to return rows from the query result (e.g., OFFSET 5 to skip
+the first 5 rows). Often used with LIMIT for paginated data
+retrieval.</p></li>
 </ol>
 <p>An illustrative SQL query incorporating this order:</p>
 <pre class="sql"><code>SELECT product_name, SUM(sales)
@@ -476,6 +571,46 @@ products that have not achieved more than 1000 in sales. The use of a
 JOIN operation ensures that the output includes the names of the
 products rather than just their IDs.</p>
 </div>
+<div id="using-sql-script-for-analytics" class="section level1"
+number="6">
+<h1><span class="header-section-number">6</span> Using SQL script for
+analytics</h1>
+<p>To execute an analytics query using an external SQL script in Python,
+you’ll first need to create the SQL script and save it as a
+<code>.sql</code> file. Then, you can use Python to read this script and
+execute it against your database. Let’s focus on Step 3 from the
+previous example and see how this can be done.</p>
+<p>Step 1: Create an External SQL Script Create a file named
+<code>analytics_query.sql</code> and include your SQL query for
+analytics in it. This file might look like this:</p>
+<pre class="sql"><code>-- analytics_query.sql
+SELECT 
+    p.product_name,
+    SUM(s.quantity) AS total_quantity,
+    SUM(s.quantity * p.price) AS total_sales
+FROM sales s
+JOIN products p ON s.product_id = p.product_id
+GROUP BY p.product_name
+ORDER BY total_sales DESC;</code></pre>
+<p>Step 2: Execute the SQL Script in Python</p>
+<p>Now, you’ll use Python to read the content of this SQL script and
+execute it against your SQLite database. The results will then be
+fetched into a Pandas DataFrame for analysis or presentation.</p>
+<pre class="python"><code>import sqlite3
+import pandas as pd
+
+# Connect to your SQLite database
+conn = sqlite3.connect(&#39;:memory:&#39;)  # Assuming you&#39;re using an in-memory database
+
+# Read the SQL script from file
+with open(&#39;analytics_query.sql&#39;, &#39;r&#39;) as file:
+    analytics_query = file.read()
+
+# Execute the SQL query and fetch the results into a Pandas DataFrame
+df = pd.read_sql_query(analytics_query, conn)
+
+# Display the results
+print(df)</code></pre>
 </div>
 
 

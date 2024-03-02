@@ -13,7 +13,7 @@
 
 <meta name="date" content="2022-11-19" />
 
-<title>Create, review, update and delete</title>
+<title>Basic Data Definition Language (DDL)</title>
 
 <script src="site_libs/header-attrs-2.25/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -260,10 +260,10 @@ $(document).ready(function () {
       <a href="https://kevinwang09.github.io/learnSQL/guides.html">Guiding principles</a>
     </li>
     <li>
-      <a href="https://kevinwang09.github.io/learnSQL/basic.html">Basic operations</a>
+      <a href="https://kevinwang09.github.io/learnSQL/basic_ddl.html">Basic data creation</a>
     </li>
     <li>
-      <a href="https://kevinwang09.github.io/learnSQL/CRUD.html">Table - Create, review, update, delete</a>
+      <a href="https://kevinwang09.github.io/learnSQL/basic_dml.html">Basic data manipulation</a>
     </li>
     <li>
       <a href="https://kevinwang09.github.io/learnSQL/join.html">Join operations</a>
@@ -310,7 +310,7 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Create, review, update and delete</h1>
+<h1 class="title toc-ignore">Basic Data Definition Language (DDL)</h1>
 <h4 class="author">Kevin Wang</h4>
 <h4 class="date">19 Nov 2022</h4>
 
@@ -362,12 +362,31 @@ dbListTables(con)</code></pre>
 </div>
 <div id="creating-a-table" class="section level1" number="2">
 <h1><span class="header-section-number">2</span> Creating a table</h1>
+<p>In this section, we create a table named <code>tbl</code> with two
+columns: <code>numbers</code> and <code>letters.</code> This is the
+foundational step in database management, where we define the schema of
+our data.</p>
+<p>Options for column creation:</p>
+<ul>
+<li><code>PRIMARY KEY</code>: Ensures each row in the table is
+unique.</li>
+<li><code>NOT NULL</code>: Ensures that a column cannot have a NULL
+value.</li>
+</ul>
 <pre class="sql"><code>/*Creating a table called tbl, with the columns numbers and letters*/
-
 CREATE TABLE tbl (
-  numbers INT, 
-  letters VARCHAR(10)
+  numbers INT PRIMARY KEY, 
+  letters VARCHAR(10) NOT NULL
 );</code></pre>
+<p>After creating the table, we can start inserting data into it. Here,
+rows are added to <code>tbl</code>, each containing values for numbers
+and letters. This operation exemplifies the ‘Create’ in CRUD.</p>
+<ul>
+<li>Batch Insertion: Allows inserting multiple rows in a single
+statement.</li>
+<li>Specifying Columns: Ensures clarity and prevents errors by
+specifying which values belong to which columns.</li>
+</ul>
 <pre class="sql"><code>INSERT INTO tbl
  (numbers, letters)
 VALUES
@@ -442,6 +461,14 @@ FROM tbl;</code></pre>
 </div>
 <div id="editing-rows" class="section level1" number="4">
 <h1><span class="header-section-number">4</span> Editing rows</h1>
+<p>Editing or updating rows in a table is essential for maintaining
+accurate and current data. This section demonstrates how to update the
+letters column of certain rows based on their numbers values.</p>
+<ul>
+<li>Conditional Updates: Modify rows based on specific conditions.</li>
+<li>Update Multiple Columns: It’s possible to update more than one
+column in the same UPDATE statement.</li>
+</ul>
 <pre class="sql"><code>UPDATE tbl
 SET 
   letters = &#39;Unknown&#39;
@@ -481,6 +508,12 @@ FROM tbl;</code></pre>
 </div>
 <div id="deleting-rows" class="section level1" number="5">
 <h1><span class="header-section-number">5</span> Deleting rows</h1>
+<p>This section covers how to remove rows from tbl where the letters
+column matches a certain condition. Deleting rows is a critical
+operation for managing the lifecycle of data within a database.</p>
+<ul>
+<li>Conditional Deletion: Delete rows based on specific conditions.</li>
+</ul>
 <pre class="sql"><code>DELETE FROM tbl WHERE letters = &#39;Unknown&#39;</code></pre>
 <pre class="sql"><code>SELECT *
 FROM tbl;</code></pre>
@@ -505,11 +538,21 @@ FROM tbl;</code></pre>
 </tbody>
 </table>
 </div>
+<ul>
+<li>Bulk Deletion: Remove a large number of rows based on a
+criterion.</li>
+</ul>
 </div>
 <div id="adding-a-new-column" class="section level1" number="6">
 <h1><span class="header-section-number">6</span> Adding a new
 column</h1>
-<p>This initiates a new column.</p>
+<p>Here we demonstrate how to add a new column <code>n2</code> to the
+existing table <code>tbl.</code> Altering a table to add new columns
+supports evolving data requirements.</p>
+<ul>
+<li>Data Type Specification: Choose the appropriate data type for the
+new column.</li>
+</ul>
 <pre class="sql"><code>ALTER TABLE tbl
   ADD n2 DECIMAL (10, 2);</code></pre>
 <pre class="sql"><code>SELECT *
@@ -538,8 +581,10 @@ FROM tbl</code></pre>
 </tbody>
 </table>
 </div>
-<p><code>UPDATE...SET...</code> allows one to set values for the
-columns.</p>
+<ul>
+<li>Default Values: Optionally, set a default value for the new
+column.</li>
+</ul>
 <pre class="sql"><code>UPDATE tbl 
 SET n2 = numbers;</code></pre>
 <pre class="sql"><code>SELECT *
@@ -568,7 +613,8 @@ FROM tbl</code></pre>
 </tbody>
 </table>
 </div>
-<p>The updates can also be conditionals.</p>
+<p><code>UPDATE...SET...</code> allows one to set values for the
+columns.</p>
 <pre class="sql"><code>UPDATE tbl 
 SET n2 = numbers * 2
 WHERE letters = &#39;A&#39;;</code></pre>
@@ -603,8 +649,18 @@ FROM tbl</code></pre>
 number="7">
 <h1><span class="header-section-number">7</span> Enforcing uniqueness in
 the columns</h1>
-<p>This is most common when we have an ID column where duplicates are
-not allowed.</p>
+<p>Ensuring that a column contains only unique values is crucial for
+data integrity, especially for identifiers like an ID column.</p>
+<ul>
+<li><p><code>UNIQUE</code> Constraint: Guarantees that all values in a
+column are different.</p></li>
+<li><p><code>PRIMARY KEY</code> Constraint: A special case of unique
+constraint, making a column a unique identifier for rows. This
+structured approach, using SQL operations within an RMarkdown document,
+provides a practical demonstration of managing a database through DDL
+and DML operations, directly applicable in data science and analytics
+projects.</p></li>
+</ul>
 <pre class="sql"><code>CREATE TABLE uniquetbl (
   ID INT NOT NULL UNIQUE, 
   letters VARCHAR(10)

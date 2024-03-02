@@ -6,8 +6,6 @@ output:
     number_sections: false
 ---
 
-```{r setup, include = FALSE}
-knitr::opts_chunk$set(eval = FALSE)
-```
+Welcome to "Learn SQL" – a curated platform I've developed to share my journey and knowledge of SQL, aiming to educate and inspire. This site is a testament to my desire to contribute to the broader community who wish to learn SQL via examples. Whether you're a beginner or looking to enhance your existing skills, I hope these resources empower you to unlock new insights and opportunities.
 
-This is a personal repository of reproducible SQL code for learning SQL. We have used `Rmarkdown` to make this website. 
+The main idea is simple, I have created some data examples using `R` and `RMarkdown`, and I will save the data in the form of a CSV, which you can find in  https://github.com/kevinwang09/learnSQL. You can download these data and set up a database locally and run the commands that I have documented. 

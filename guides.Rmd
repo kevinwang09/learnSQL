@@ -8,9 +8,8 @@ output: html_document
 knitr::opts_chunk$set(eval = FALSE)
 ```
 
-# Some basic principles 
 
-## Why use relational database?
+# Why use relational database?
 
 A relational database is a set of tables (datasets with rows and columns) that contain information relating to other tables in the database.
 
@@ -18,7 +17,7 @@ Relational databases have big benefits over simple data storage like CSV files o
 
 Relational databases also let you do complex searches and changes with SQL, something that's hard with just CSV files or data frames. They provide a central place for data, making it easier for many people to use it at the same time while keeping the data safe and sound, showing why they're a go-to choice for managing detailed and interconnected data in a clean and efficient way.
 
-## Connection to a database
+# Connection to a database
 
 "Connection to a database will depend on what sort of database we are working with and what programming language we are using. In this section, we will explore how to connect to both SQLite and MySQL databases using Python.
 
@@ -73,27 +72,108 @@ conn.commit()
 conn.close()
 ```
 
-## Ordering of the verbs
+# Data Definition Language (DDL) vs Data Manipulation Language (DML)
+
+In the context of SQL, operations on databases are categorized into two main types: Data Definition Language (DDL) and Data Manipulation Language (DML). These categories help organize the types of commands used to interact with databases and their data.
+
+## Examples of DDL
+
+DDL statements are used for defining, altering, and deleting database objects like tables, indexes, and schemas. Here are some examples:
+
+1. CREATE: Used to create a new table or database.
+```{sql}
+CREATE TABLE students (
+    student_id INT PRIMARY KEY,
+    name VARCHAR(100),
+    enrollment_date DATE
+);
+```
+
+2. ALTER: Used to modify an existing database object, such as adding a column to a table.
+
+```{sql}
+ALTER TABLE students ADD COLUMN email VARCHAR(255);
+```
+
+3. TRUNCATE: Used to delete all rows in a table without removing the table itself.
+
+```{sql}
+TRUNCATE TABLE students;
+```
+
+4. DROP: Used to delete an object from the database, such as a table.
+
+```{sql}
+DROP TABLE students;
+```
+
+## Examples of DML
+
+DML statements are used for inserting, querying, updating, and deleting data in the tables. These operations correspond to the CRUD (Create, Read, Update, Delete) operations. Here are some examples:
+
+1. INSERT (Create): Used to insert data into a table.
+
+```{sql}
+INSERT INTO students (student_id, name, enrollment_date)
+VALUES (1, 'John Doe', '2021-09-01');
+```
+
+2. SELECT (Read): Used to query data from a table.
+
+```{sql}
+SELECT * FROM students WHERE student_id = 1;
+```
+
+3. UPDATE (Update): Used to modify existing data in a table.
+
+```{sql}
+UPDATE students SET email = 'john.doe@example.com' WHERE student_id = 1;
+```
+
+4. DELETE (Delete): Used to remove data from a table.
+
+```{sql}
+DELETE FROM students WHERE student_id = 1;
+```
+
+# Version Controlling a Table
+
+When managing databases, it's often necessary to create a copy or version of a table. This can be for various reasons such as backup, testing, or version control purposes. SQL provides a straightforward method to accomplish this by using a CREATE TABLE AS SELECT statement. This command creates a new table and populates it with data selected from another table. This method is particularly useful for creating a snapshot of the current state of a table, which can serve as a version control mechanism.
+
+To copy a table, you essentially create a new table with the same structure and data as the original. This is useful for backup purposes or when you need a duplicate for testing without affecting the original data.
+
+Here's how you can copy a table named `original_table_20230301` to a new table called `backup_table`:
+
+```{sql}
+CREATE TABLE original_table_20230301 AS
+SELECT *
+FROM original_table;
+```
+
+If you only want to copy the structure of that table but not the data, you can add an additional `WHERE 1=0` at the end, as this statement is always evaluated to false, no data will be copied. 
+
+
+# Ordering of the verbs
 
 When composing SQL queries, the sequence in which you arrange various clauses is crucial for the database to correctly execute commands and retrieve data. SQL syntax necessitates a specific order of operations, and following this hierarchy ensures your queries are both valid and efficient. Here’s an elaboration of the order of operations in an SQL query, emphasizing the hierarchy of SQL verbs and including examples for each:
 
-1. SELECT: Specifies the columns to return. You can also perform calculations or transformations on the data here (e.g., SELECT name, SUM(sales) for aggregate sales by name).
+1. `SELECT`: Specifies the columns to return. You can also perform calculations or transformations on the data here (e.g., SELECT name, SUM(sales) for aggregate sales by name).
 
-1. FROM: Indicates the table(s) from which data will be retrieved (e.g., FROM sales_table). This clause sets the context for the source of your data.
+1. `FROM`: Indicates the table(s) from which data will be retrieved (e.g., FROM sales_table). This clause sets the context for the source of your data.
 
-1. JOIN: Used for combining rows from two or more tables based on a related column between them (e.g., JOIN product_table ON sales_table.product_id = product_table.id). The JOIN clause, which follows FROM, details the type of join (INNER, LEFT, RIGHT, FULL OUTER) and the conditions for joining.
+1. `JOIN`: Used for combining rows from two or more tables based on a related column between them (e.g., JOIN product_table ON sales_table.product_id = product_table.id). The JOIN clause, which follows FROM, details the type of join (INNER, LEFT, RIGHT, FULL OUTER) and the conditions for joining.
 
-1. WHERE: Filters rows based on specific conditions (e.g., WHERE sales_date > '2023-01-01'). Only rows that meet these criteria will be included in the output. This clause is applied before the data is grouped.
+1. `WHERE`: Filters rows based on specific conditions (e.g., WHERE sales_date > '2023-01-01'). Only rows that meet these criteria will be included in the output. This clause is applied before the data is grouped.
 
-1. GROUP BY: Groups rows that have the same values in specified columns into summary rows (e.g., GROUP BY product_category). Essential for aggregate functions (SUM, AVG, MAX, etc.), it organizes the data into subsets for aggregation.
+1. `GROUP BY`: Groups rows that have the same values in specified columns into summary rows (e.g., GROUP BY product_category). Essential for aggregate functions (SUM, AVG, MAX, etc.), it organizes the data into subsets for aggregation.
 
-1. HAVING: Filters groups of data after they have been aggregated with GROUP BY (e.g., HAVING SUM(sales) > 1000). WHERE filters individual rows, HAVING filters aggregated groups.
+1. `HAVING`: Filters groups of data after they have been aggregated with GROUP BY (e.g., HAVING SUM(sales) > 1000). WHERE filters individual rows, HAVING filters aggregated groups.
 
-1. ORDER BY: Determines the order of the final set of rows returned, based on one or more columns (e.g., ORDER BY total_sales DESC). Specifies ascending (ASC) or descending (DESC) order.
+1. `ORDER BY`: Determines the order of the final set of rows returned, based on one or more columns (e.g., ORDER BY total_sales DESC). Specifies ascending (ASC) or descending (DESC) order.
 
-1. LIMIT (or FETCH): Limits the number of rows returned by the query, useful for handling large datasets or implementing pagination (e.g., LIMIT 10 for the top 10 rows).
+1. `LIMIT` (or `FETCH`): Limits the number of rows returned by the query, useful for handling large datasets or implementing pagination (e.g., LIMIT 10 for the top 10 rows).
 
-1. OFFSET: Skips a specified number of rows before starting to return rows from the query result (e.g., OFFSET 5 to skip the first 5 rows). Often used with LIMIT for paginated data retrieval.
+1. `OFFSET`: Skips a specified number of rows before starting to return rows from the query result (e.g., OFFSET 5 to skip the first 5 rows). Often used with LIMIT for paginated data retrieval.
 
 An illustrative SQL query incorporating this order:
 
@@ -109,3 +189,44 @@ LIMIT 10;
 ```
 
 This query is designed to identify the top 10 selling products based on total sales volume from January 1, 2023, onwards, filtering out any products that have not achieved more than 1000 in sales. The use of a JOIN operation ensures that the output includes the names of the products rather than just their IDs.
+
+# Using SQL script for analytics
+
+To execute an analytics query using an external SQL script in Python, you'll first need to create the SQL script and save it as a `.sql` file. Then, you can use Python to read this script and execute it against your database. Let's focus on Step 3 from the previous example and see how this can be done.
+
+Step 1: Create an External SQL Script
+Create a file named `analytics_query.sql` and include your SQL query for analytics in it. This file might look like this:
+
+```{sql}
+-- analytics_query.sql
+SELECT 
+    p.product_name,
+    SUM(s.quantity) AS total_quantity,
+    SUM(s.quantity * p.price) AS total_sales
+FROM sales s
+JOIN products p ON s.product_id = p.product_id
+GROUP BY p.product_name
+ORDER BY total_sales DESC;
+```
+
+Step 2: Execute the SQL Script in Python
+
+Now, you'll use Python to read the content of this SQL script and execute it against your SQLite database. The results will then be fetched into a Pandas DataFrame for analysis or presentation.
+
+```{python}
+import sqlite3
+import pandas as pd
+
+# Connect to your SQLite database
+conn = sqlite3.connect(':memory:')  # Assuming you're using an in-memory database
+
+# Read the SQL script from file
+with open('analytics_query.sql', 'r') as file:
+    analytics_query = file.read()
+
+# Execute the SQL query and fetch the results into a Pandas DataFrame
+df = pd.read_sql_query(analytics_query, conn)
+
+# Display the results
+print(df)
+```

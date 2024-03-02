@@ -1,5 +1,5 @@
 ---
-title: "Basic operations"
+title: "Basic data manipulation language (DML)"
 author: "Kevin Wang"
 date: "20 Nov 2022"
 output: html_document

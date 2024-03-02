@@ -1218,10 +1218,20 @@ GROUP BY species</code></pre>
 </div>
 <div id="string-operations" class="section level1" number="9">
 <h1><span class="header-section-number">9</span> String operations</h1>
+<p>SQL’s LIKE operator is a powerful tool for pattern matching in string
+comparison. It’s especially useful for filtering rows based on specific
+text patterns within columns. Here are some examples:</p>
+<ul>
+<li>The percent symbol (<code>%</code>) represents any sequence of zero
+or more characters.</li>
+<li>The underscore (<code>_</code>) is used to match exactly one
+character.</li>
+<li>Using square brackets <code>[]</code>, you can match any single
+character within the specified set.</li>
+</ul>
 <p>The first task aims to tally the species of penguins, for entries
 with island begin with the characters “Torg”.</p>
-<pre class="sql"><code>SELECT species, 
-       COUNT(species) AS n
+<pre class="sql"><code>SELECT species, island, COUNT(species) AS n
 FROM penguins
 WHERE island LIKE &quot;Torg%&quot;
 GROUP BY species</code></pre>
@@ -1231,12 +1241,14 @@ GROUP BY species</code></pre>
 <thead>
 <tr class="header">
 <th align="left">species</th>
+<th align="left">island</th>
 <th align="right">n</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">Adelie</td>
+<td align="left">Torgersen</td>
 <td align="right">52</td>
 </tr>
 </tbody>
@@ -1244,8 +1256,7 @@ GROUP BY species</code></pre>
 </div>
 <p>The second task aims to tally the species of penguins, for entries
 with island’s second character equal to “r”.</p>
-<pre class="sql"><code>SELECT species, 
-       COUNT(species) AS n
+<pre class="sql"><code>SELECT species, island, COUNT(species) AS n
 FROM penguins
 WHERE island LIKE &quot;_r%&quot;
 GROUP BY species</code></pre>
@@ -1255,16 +1266,19 @@ GROUP BY species</code></pre>
 <thead>
 <tr class="header">
 <th align="left">species</th>
+<th align="left">island</th>
 <th align="right">n</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">Adelie</td>
+<td align="left">Dream</td>
 <td align="right">56</td>
 </tr>
 <tr class="even">
 <td align="left">Chinstrap</td>
+<td align="left">Dream</td>
 <td align="right">68</td>
 </tr>
 </tbody>

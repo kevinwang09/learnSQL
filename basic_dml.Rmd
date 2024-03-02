@@ -173,11 +173,18 @@ GROUP BY species
 
 # String operations
 
+
+SQL's LIKE operator is a powerful tool for pattern matching in string comparison. It's especially useful for filtering rows based on specific text patterns within columns. Here are some examples:
+
++ The percent symbol (`%`) represents any sequence of zero or more characters. 
++ The underscore (`_`) is used to match exactly one character. 
++ Using square brackets `[]`, you can match any single character within the specified set.
+
+
 The first task aims to tally the species of penguins, for entries with island begin with the characters "Torg".
 
 ```{sql, connection=con}
-SELECT species, 
-       COUNT(species) AS n
+SELECT species, island, COUNT(species) AS n
 FROM penguins
 WHERE island LIKE "Torg%"
 GROUP BY species
@@ -186,8 +193,7 @@ GROUP BY species
 The second task aims to tally the species of penguins, for entries with island's second character equal to "r".
 
 ```{sql, connection=con}
-SELECT species, 
-       COUNT(species) AS n
+SELECT species, island, COUNT(species) AS n
 FROM penguins
 WHERE island LIKE "_r%"
 GROUP BY species
